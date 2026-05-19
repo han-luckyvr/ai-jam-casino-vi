@@ -182,18 +182,23 @@ function ResolveGrid({
           borderRadius: 4,
         }}
       >
-        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((c) => (
-          <div
-            key={c}
-            className="scanline"
-            style={{
-              position: "relative",
-              border: "1px solid rgba(42,234,255,0.32)",
-            }}
-          >
-            {c === cell && <Ball />}
-          </div>
-        ))}
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((c) => {
+          const isWinning = c === cell;
+          return (
+            <div
+              key={c}
+              className={`scanline${isWinning ? " winning-cell" : ""}`}
+              style={{
+                position: "relative",
+                ...(isWinning
+                  ? {}
+                  : { border: "1px solid rgba(42,234,255,0.32)" }),
+              }}
+            >
+              {isWinning && <Ball />}
+            </div>
+          );
+        })}
       </div>
 
       {/* Decorative corner endpoints (match StrikeZoneGrid). */}
