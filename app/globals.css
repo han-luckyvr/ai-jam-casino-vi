@@ -595,11 +595,25 @@ a {
   background: rgba(255, 255, 255, 0.1);
   border: 1.5px solid rgba(255, 255, 255, 0.25);
 }
-.count-sq.on {
+.count-row.ball .count-sq.on {
+  background: #22e06a;
+  border-color: #4dff8c;
+  box-shadow:
+    0 0 6px rgba(34, 224, 106, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.count-row.strike .count-sq.on {
   background: #ffc72c;
   border-color: #ffd54a;
   box-shadow:
     0 0 6px rgba(255, 199, 44, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.count-row.out .count-sq.on {
+  background: #f8050e;
+  border-color: #ff4a4a;
+  box-shadow:
+    0 0 6px rgba(248, 5, 14, 0.75),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 

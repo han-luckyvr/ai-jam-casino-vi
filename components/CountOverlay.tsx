@@ -18,7 +18,7 @@ export default function CountOverlay() {
         </div>
       </div>
       <div className="count-body">
-        <div className="count-row">
+        <div className="count-row ball">
           <span className="count-label">BALL</span>
           <div className="count-squares" aria-hidden="true">
             <span className="count-sq on" />
@@ -26,14 +26,14 @@ export default function CountOverlay() {
             <span className="count-sq on" />
           </div>
         </div>
-        <div className="count-row">
+        <div className="count-row strike">
           <span className="count-label">STRIKE</span>
           <div className="count-squares" aria-hidden="true">
             <span className="count-sq on" />
             <span className="count-sq on" />
           </div>
         </div>
-        <div className="count-row">
+        <div className="count-row out">
           <span className="count-label">OUT</span>
           <div className="count-squares" aria-hidden="true">
             <span className="count-sq on" />
