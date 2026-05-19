@@ -56,30 +56,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
 
   const selectChip = (chip: ChipValue) => {
     if (chip === state.activeChip) return;
-    if (state.bets.length === 0) {
-      playChipClick();
-      dispatch({ type: "SET_ACTIVE_CHIP", chip });
-      return;
-    }
-    const repriced = state.bets.reduce(
-      (sum, bet) => sum + stakeForBet(bet.kind, chip),
-      0,
-    );
-    if (repriced > balance) {
-      flash(`Switch blocked — repricing ${state.bets.length} bets to $${chip} = $${repriced.toLocaleString("en-US")} exceeds balance $${balance.toLocaleString("en-US")}`);
-      return;
-    }
     playChipClick();
-    const original = state.bets;
-    dispatch({ type: "CLEAR_BETS" });
-    for (const bet of original) {
-      const stake = stakeForBet(bet.kind, chip);
-      if (bet.kind === "zone") {
-        dispatch({ type: "PLACE_BET", bet: { kind: "zone", cell: bet.cell, amount: stake } });
-      } else {
-        dispatch({ type: "PLACE_BET", bet: { kind: "line", line: bet.line, amount: stake } });
-      }
-    }
     dispatch({ type: "SET_ACTIVE_CHIP", chip });
   };
 

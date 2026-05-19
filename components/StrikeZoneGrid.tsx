@@ -59,9 +59,9 @@ function aggregate(bets: ReadonlyArray<Bet>) {
 }
 
 function chipColor(total: number): string {
-  if (total >= 100) return "var(--yellow)";
-  if (total >= 25) return "var(--magenta)";
-  if (total >= 5) return "var(--cyan)";
+  if (total >= 25) return "var(--orange)";
+  if (total >= 10) return "var(--blue)";
+  if (total >= 5) return "var(--red)";
   return "var(--cream)";
 }
 
@@ -72,7 +72,7 @@ function discStyle(total: number, size: number): React.CSSProperties {
     height: size,
     borderRadius: "50%",
     background: `radial-gradient(circle at 35% 30%, ${color}, ${color} 60%, rgba(0,0,0,0.3) 100%)`,
-    color: total >= 25 ? "var(--cream)" : "var(--bg)",
+    color: total >= 5 ? "var(--cream)" : "var(--bg)",
     fontFamily: "var(--font-montserrat), sans-serif",
     fontWeight: 800,
     fontSize: size > 30 ? 13 : 10,

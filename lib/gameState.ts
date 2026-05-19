@@ -10,7 +10,7 @@ export type Screen =
   | "R2_SWING"
   | "R2_RESOLVE";
 
-export type ChipValue = 1 | 5 | 25 | 100;
+export type ChipValue = 1 | 5 | 10 | 25;
 
 export type Bet =
   | { kind: "zone"; cell: number; amount: number }
