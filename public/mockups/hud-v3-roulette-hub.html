@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HUD V3 · Roulette Hub</title>
+<style>
+  :root {
+    --bg: #000;
+    --cream: #fff4db;
+    --magenta: #fb009f;
+    --cyan: #2aeaff;
+    --yellow: #ffe054;
+    --muted: rgba(255, 244, 219, 0.62);
+    --rule: rgba(255, 244, 219, 0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100vh; background: var(--bg); color: var(--cream); font-family: 'Montserrat', system-ui, sans-serif; font-weight: 300; overflow-x: hidden; }
+
+  /* ===== Scene shell ===== */
+  .scene { position: relative; min-height: 100vh; width: 100%; overflow: hidden; }
+  .scene-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; z-index: 0; }
+  .field { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 220px 24px 56px; }
+
+  /* Strike zone */
+  .zone-wrap { position: relative; width: min(380px, 70vw); height: min(380px, 70vw); }
+  .zone-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; border: 2px solid rgba(42,234,255,0.7); box-shadow: inset 0 0 20px rgba(42,234,255,0.18), 0 0 18px rgba(42,234,255,0.22); background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(42,234,255,0.04) 3px 4px); }
+  .zone-cell { border-right: 1px solid rgba(42,234,255,0.38); border-bottom: 1px solid rgba(42,234,255,0.38); }
+  .zone-cell:nth-child(3n) { border-right: 0; }
+  .zone-cell:nth-child(n+7) { border-bottom: 0; }
+  .marker { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--cyan); background: rgba(0,0,0,0.7); box-shadow: 0 0 6px rgba(42,234,255,0.65); transform: translate(-50%, -50%); }
+
+  /* Chip rack */
+  .chip-rack { display: flex; gap: 16px; align-items: center; }
+  .chip { width: 56px; height: 56px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22); cursor: pointer; }
+  .chip-1 { background: var(--cream); color: #000; }
+  .chip-5 { background: var(--cyan); color: #000; transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22), 0 0 0 3px rgba(42,234,255,0.5); }
+  .chip-25 { background: var(--magenta); color: var(--cream); }
+  .chip-100 { background: var(--yellow); color: #000; }
+  .chip-clear { background: transparent; border: 1px solid var(--rule); color: var(--muted); padding: 10px 22px; border-radius: 999px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; }
+  .throw-btn { background: var(--magenta); color: var(--cream); border: 1px solid var(--cream); padding: 16px 36px; border-radius: 999px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; box-shadow: 0 0 24px rgba(251,0,159,0.45); cursor: pointer; }
+
+  /* Footer chrome */
+  .back-link { position: fixed; bottom: 14px; left: 14px; z-index: 20; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+  .label-tag { position: fixed; bottom: 14px; right: 14px; z-index: 20; color: var(--muted); font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+
+  /* ===== V3: Roulette Hub ===== */
+  .hub-stage {
+    position: fixed;
+    top: 24px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex; align-items: center; gap: 0;
+  }
+  .satellite {
+    padding: 10px 18px;
+    background: rgba(12,10,31,0.78);
+    border: 1px solid var(--cyan);
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    font-family: 'Montserrat', sans-serif;
+    display: flex; align-items: baseline; gap: 8px;
+    box-shadow: 0 0 18px rgba(42,234,255,0.25);
+    position: relative;
+  }
+  .satellite .s-label {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.22em;
+    color: var(--cyan); text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(42,234,255,0.55);
+  }
+  .satellite .s-value {
+    font-size: 18px; font-weight: 800;
+    color: var(--cream);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 8px rgba(255,244,219,0.4);
+  }
+  .satellite.left { margin-right: 0; }
+  .satellite.right { margin-left: 0; }
+  /* Neon thread connecting satellites to the hub */
+  .thread {
+    width: 56px;
+    height: 1.5px;
+    background: linear-gradient(90deg, rgba(42,234,255,0) 0%, rgba(42,234,255,0.85) 100%);
+    box-shadow: 0 0 6px rgba(42,234,255,0.65);
+  }
+  .thread.right { background: linear-gradient(270deg, rgba(42,234,255,0) 0%, rgba(42,234,255,0.85) 100%); }
+
+  .hub {
+    position: relative;
+    width: 180px; height: 180px;
+    margin: 0 4px;
+  }
+  /* Outer ring with rotating tick marks */
+  .hub-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    animation: rot 22s linear infinite;
+  }
+  @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .hub-ring { animation: none; } }
+
+  .hub-tick {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2px; height: 10px;
+    margin-left: -1px; margin-top: -84px;
+    background: rgba(42,234,255,0.55);
+    transform-origin: 50% 84px;
+    border-radius: 2px;
+  }
+  .hub-tick.major {
+    background: var(--magenta);
+    box-shadow: 0 0 6px var(--magenta), 0 0 12px rgba(251,0,159,0.4);
+    width: 3px;
+    height: 12px;
+    margin-left: -1.5px; margin-top: -84px;
+  }
+
+  /* Static rim engraving */
+  .hub-rim {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  .hub-rim svg { width: 100%; height: 100%; overflow: visible; }
+  .hub-rim text {
+    fill: var(--cyan);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 8px;
+    letter-spacing: 0.5em;
+    filter: drop-shadow(0 0 4px rgba(42,234,255,0.55));
+  }
+
+  /* Inner well */
+  .hub-inner {
+    position: absolute;
+    inset: 22px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(42,234,255,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(251,0,159,0.18) 0%, transparent 50%),
+      radial-gradient(circle at center, rgba(12,10,31,0.96) 0%, rgba(0,0,0,1) 100%);
+    border: 1px solid rgba(42,234,255,0.4);
+    box-shadow:
+      inset 0 0 22px rgba(42,234,255,0.22),
+      0 0 32px rgba(251,0,159,0.4),
+      0 0 56px rgba(42,234,255,0.2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    animation: pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: inset 0 0 22px rgba(42,234,255,0.22), 0 0 32px rgba(251,0,159,0.4), 0 0 56px rgba(42,234,255,0.2); }
+    50%      { box-shadow: inset 0 0 32px rgba(42,234,255,0.4), 0 0 44px rgba(251,0,159,0.55), 0 0 76px rgba(42,234,255,0.3); }
+  }
+  @media (prefers-reduced-motion: reduce) { .hub-inner { animation: none; } }
+
+  .hub-eyebrow {
+    font-size: 9px; font-weight: 800;
+    color: var(--cyan); letter-spacing: 0.34em;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(42,234,255,0.7);
+    margin-bottom: 4px;
+  }
+  .hub-value {
+    font-size: 28px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--cream);
+    text-shadow:
+      0 0 10px rgba(42,234,255,0.75),
+      0 0 22px rgba(251,0,159,0.55);
+    line-height: 1;
+  }
+
+  @media (max-width: 700px) {
+    .hub-stage { gap: 0; }
+    .hub { width: 140px; height: 140px; }
+    .hub-tick { margin-top: -64px; transform-origin: 50% 64px; }
+    .hub-tick.major { margin-top: -64px; }
+    .hub-inner { inset: 18px; }
+    .hub-value { font-size: 22px; }
+    .satellite { padding: 7px 12px; }
+    .satellite .s-label { font-size: 8px; letter-spacing: 0.18em; }
+    .satellite .s-value { font-size: 14px; }
+    .thread { width: 24px; }
+    .field { padding-top: 200px; }
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <img class="scene-bg" src="/assets/IMG-03.jpg" alt="" aria-hidden="true" />
+
+  <!-- ===== HUD: Roulette Hub ===== -->
+  <div class="hub-stage" aria-label="Game readouts">
+    <div class="satellite left">
+      <span class="s-label">Bal</span>
+      <span class="s-value">$1,160</span>
+    </div>
+    <span class="thread"></span>
+    <div class="hub">
+      <div class="hub-ring">
+        <span class="hub-tick major" style="transform: rotate(0deg);"></span>
+        <span class="hub-tick" style="transform: rotate(30deg);"></span>
+        <span class="hub-tick" style="transform: rotate(60deg);"></span>
+        <span class="hub-tick major" style="transform: rotate(90deg);"></span>
+        <span class="hub-tick" style="transform: rotate(120deg);"></span>
+        <span class="hub-tick" style="transform: rotate(150deg);"></span>
+        <span class="hub-tick major" style="transform: rotate(180deg);"></span>
+        <span class="hub-tick" style="transform: rotate(210deg);"></span>
+        <span class="hub-tick" style="transform: rotate(240deg);"></span>
+        <span class="hub-tick major" style="transform: rotate(270deg);"></span>
+        <span class="hub-tick" style="transform: rotate(300deg);"></span>
+        <span class="hub-tick" style="transform: rotate(330deg);"></span>
+      </div>
+      <div class="hub-rim">
+        <svg viewBox="0 0 180 180">
+          <defs>
+            <path id="rim" d="M 90,90 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0" fill="none" />
+          </defs>
+          <text><textPath href="#rim" startOffset="0">★ PROGRESSIVE JACKPOT ★ PROGRESSIVE JACKPOT</textPath></text>
+        </svg>
+      </div>
+      <div class="hub-inner">
+        <div class="hub-eyebrow">Jackpot</div>
+        <div class="hub-value">$1,002</div>
+      </div>
+    </div>
+    <span class="thread right"></span>
+    <div class="satellite right">
+      <span class="s-label">Stake</span>
+      <span class="s-value">$0</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="zone-wrap">
+      <div class="zone-grid">
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+      </div>
+      <span class="marker" style="top:16.67%;left:-7%"></span>
+      <span class="marker" style="top:50%;left:-7%"></span>
+      <span class="marker" style="top:83.33%;left:-7%"></span>
+      <span class="marker" style="left:16.67%;top:-7%"></span>
+      <span class="marker" style="left:50%;top:-7%"></span>
+      <span class="marker" style="left:83.33%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:107%"></span>
+    </div>
+
+    <div class="chip-rack">
+      <button class="chip chip-1">$1</button>
+      <button class="chip chip-5">$5</button>
+      <button class="chip chip-25">$25</button>
+      <button class="chip chip-100">$100</button>
+      <button class="chip-clear">Clear</button>
+    </div>
+
+    <button class="throw-btn">▸ Throw Pitch</button>
+  </div>
+
+  <a class="back-link" href="/mockups/index.html">← All HUDs</a>
+  <div class="label-tag">V3 · Roulette Hub</div>
+</div>
+</body>
+</html>

@@ -57,6 +57,32 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
           objectFit: "cover",
         }}
       />
+      <button
+        type="button"
+        onClick={resolve}
+        aria-label="Skip pitch video"
+        style={{
+          position: "fixed",
+          left: "50%",
+          bottom: 48,
+          transform: "translateX(-50%)",
+          zIndex: 2,
+          background: "var(--magenta)",
+          color: "var(--cream)",
+          border: "1px solid var(--cream)",
+          padding: "16px 36px",
+          borderRadius: 999,
+          fontFamily: "var(--font-montserrat), sans-serif",
+          fontWeight: 800,
+          fontSize: 13,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          cursor: "pointer",
+          boxShadow: "0 0 24px rgba(251,0,159,0.45)",
+        }}
+      >
+        Skip ▸
+      </button>
     </main>
   );
 }

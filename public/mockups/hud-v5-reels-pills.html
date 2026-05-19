@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HUD V5 · Mechanical Reels + Brushed-Metal Pills</title>
+<style>
+  :root {
+    --bg: #000;
+    --cream: #fff4db;
+    --magenta: #fb009f;
+    --cyan: #2aeaff;
+    --yellow: #ffe054;
+    --muted: rgba(255, 244, 219, 0.62);
+    --rule: rgba(255, 244, 219, 0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100vh; background: var(--bg); color: var(--cream); font-family: 'Montserrat', system-ui, sans-serif; font-weight: 300; overflow-x: hidden; }
+
+  /* ===== Scene shell ===== */
+  .scene { position: relative; min-height: 100vh; width: 100%; overflow: hidden; }
+  .scene-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; z-index: 0; }
+  .field { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 160px 24px 56px; }
+
+  /* Strike zone */
+  .zone-wrap { position: relative; width: min(380px, 70vw); height: min(380px, 70vw); }
+  .zone-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; border: 2px solid rgba(42,234,255,0.7); box-shadow: inset 0 0 20px rgba(42,234,255,0.18), 0 0 18px rgba(42,234,255,0.22); background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(42,234,255,0.04) 3px 4px); }
+  .zone-cell { border-right: 1px solid rgba(42,234,255,0.38); border-bottom: 1px solid rgba(42,234,255,0.38); }
+  .zone-cell:nth-child(3n) { border-right: 0; }
+  .zone-cell:nth-child(n+7) { border-bottom: 0; }
+  .marker { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--cyan); background: rgba(0,0,0,0.7); box-shadow: 0 0 6px rgba(42,234,255,0.65); transform: translate(-50%, -50%); }
+
+  /* Chip rack */
+  .chip-rack { display: flex; gap: 16px; align-items: center; }
+  .chip { width: 56px; height: 56px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22); cursor: pointer; }
+  .chip-1 { background: var(--cream); color: #000; }
+  .chip-5 { background: var(--cyan); color: #000; transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22), 0 0 0 3px rgba(42,234,255,0.5); }
+  .chip-25 { background: var(--magenta); color: var(--cream); }
+  .chip-100 { background: var(--yellow); color: #000; }
+  .chip-clear { background: transparent; border: 1px solid var(--rule); color: var(--muted); padding: 10px 22px; border-radius: 999px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; }
+  .throw-btn { background: var(--magenta); color: var(--cream); border: 1px solid var(--cream); padding: 16px 36px; border-radius: 999px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; box-shadow: 0 0 24px rgba(251,0,159,0.45); cursor: pointer; }
+
+  /* Footer chrome */
+  .back-link { position: fixed; bottom: 14px; left: 14px; z-index: 20; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+  .label-tag { position: fixed; bottom: 14px; right: 14px; z-index: 20; color: var(--muted); font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+
+  /* ===== V5: Brushed-metal pills + odometer reels ===== */
+  .bm-pill {
+    position: fixed;
+    top: 24px;
+    z-index: 10;
+    padding: 10px 22px 10px 18px;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, #6a6a6a 0%, #2a2a2a 55%, #4a4a4a 100%);
+    border: 1px solid #1a1a1a;
+    border-radius: 999px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.3),
+      inset 0 -1px 0 rgba(0,0,0,0.55),
+      0 4px 12px rgba(0,0,0,0.65),
+      0 0 18px rgba(42,234,255,0.22);
+    font-family: 'Montserrat', sans-serif;
+    display: flex; align-items: baseline; gap: 12px;
+    min-width: 150px;
+  }
+  .bm-pill.left { left: 22px; }
+  .bm-pill.right { right: 22px; }
+  .bm-label {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    text-shadow: 0 0 6px rgba(42,234,255,0.55);
+  }
+  .bm-value {
+    font-size: 22px; font-weight: 800;
+    color: var(--cream);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    text-shadow:
+      0 0 8px rgba(255,244,219,0.5),
+      0 1px 0 rgba(0,0,0,0.6);
+    margin-left: auto;
+    line-height: 1;
+  }
+
+  /* Odometer reel jackpot */
+  .reel-frame {
+    position: fixed;
+    top: 16px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 8px 22px 14px;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, #6a6a6a 0%, #2a2a2a 60%, #4a4a4a 100%);
+    border: 2px solid #1a1a1a;
+    border-radius: 14px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.3),
+      inset 0 -1px 0 rgba(0,0,0,0.55),
+      0 6px 22px rgba(0,0,0,0.7),
+      0 0 28px rgba(255,224,84,0.32);
+    display: flex; flex-direction: column;
+    align-items: center; gap: 6px;
+    position: fixed;
+  }
+  .reel-rivet {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #aaa, #2a2a2a);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .reel-rivet.tl { top: 4px; left: 5px; }
+  .reel-rivet.tr { top: 4px; right: 5px; }
+  .reel-rivet.bl { bottom: 4px; left: 5px; }
+  .reel-rivet.br { bottom: 4px; right: 5px; }
+
+  .reel-label {
+    color: var(--yellow);
+    font-weight: 800;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(255,224,84,0.65), 0 1px 0 rgba(0,0,0,0.6);
+  }
+  .reel-digits {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+  .reel-digit {
+    position: relative;
+    width: 30px; height: 44px;
+    background: linear-gradient(180deg, #1a1a1a 0%, #050505 50%, #1a1a1a 100%);
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    box-shadow:
+      inset 0 0 10px rgba(0,0,0,0.85),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream);
+    font-size: 28px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    font-family: 'Montserrat', sans-serif;
+    text-shadow:
+      0 0 10px rgba(255,244,219,0.8),
+      0 0 18px rgba(255,224,84,0.5),
+      0 1px 0 rgba(0,0,0,0.6);
+    overflow: hidden;
+    line-height: 1;
+  }
+  /* Top + bottom shading to suggest a rotating reel */
+  .reel-digit::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 38%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.10) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .reel-digit::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 38%;
+    background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .reel-symbol {
+    color: var(--yellow);
+    font-size: 22px;
+    font-weight: 800;
+    padding: 0 1px;
+    text-shadow: 0 0 6px rgba(255,224,84,0.7), 0 1px 0 rgba(0,0,0,0.6);
+    font-family: 'Montserrat', sans-serif;
+  }
+  /* Subtle 'tick' on the rightmost (ones) digit — implies movement */
+  .reel-digit.tick {
+    animation: tick 5.5s ease-in-out infinite;
+  }
+  @keyframes tick {
+    0%, 92%, 100% { transform: translateY(0); }
+    96%           { transform: translateY(-2px); }
+    98%           { transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) { .reel-digit.tick { animation: none; } }
+
+  @media (max-width: 700px) {
+    .bm-pill { padding: 7px 16px 7px 14px; min-width: 0; gap: 8px; top: 16px; }
+    .bm-pill.left { left: 12px; }
+    .bm-pill.right { right: 12px; }
+    .bm-label { font-size: 8px; letter-spacing: 0.2em; }
+    .bm-value { font-size: 15px; }
+    .reel-frame { padding: 6px 14px 10px; }
+    .reel-label { font-size: 8px; letter-spacing: 0.26em; }
+    .reel-digit { width: 22px; height: 32px; font-size: 21px; }
+    .reel-symbol { font-size: 17px; }
+    .field { padding-top: 140px; }
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <img class="scene-bg" src="/assets/IMG-03.jpg" alt="" aria-hidden="true" />
+
+  <!-- ===== HUD: Brushed-metal pills + odometer reels ===== -->
+  <div class="bm-pill left" aria-label="Balance: 1160 dollars">
+    <span class="bm-label">Balance</span>
+    <span class="bm-value">$1,160</span>
+  </div>
+
+  <div class="reel-frame" aria-label="Progressive jackpot: 1002 dollars">
+    <span class="reel-rivet tl"></span><span class="reel-rivet tr"></span>
+    <span class="reel-rivet bl"></span><span class="reel-rivet br"></span>
+    <div class="reel-label">Progressive Jackpot</div>
+    <div class="reel-digits">
+      <span class="reel-symbol">$</span>
+      <div class="reel-digit">1</div>
+      <span class="reel-symbol">,</span>
+      <div class="reel-digit">0</div>
+      <div class="reel-digit">0</div>
+      <div class="reel-digit tick">2</div>
+    </div>
+  </div>
+
+  <div class="bm-pill right" aria-label="Staked: 0 dollars">
+    <span class="bm-label">Staked</span>
+    <span class="bm-value">$0</span>
+  </div>
+
+  <div class="field">
+    <div class="zone-wrap">
+      <div class="zone-grid">
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+      </div>
+      <span class="marker" style="top:16.67%;left:-7%"></span>
+      <span class="marker" style="top:50%;left:-7%"></span>
+      <span class="marker" style="top:83.33%;left:-7%"></span>
+      <span class="marker" style="left:16.67%;top:-7%"></span>
+      <span class="marker" style="left:50%;top:-7%"></span>
+      <span class="marker" style="left:83.33%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:107%"></span>
+    </div>
+
+    <div class="chip-rack">
+      <button class="chip chip-1">$1</button>
+      <button class="chip chip-5">$5</button>
+      <button class="chip chip-25">$25</button>
+      <button class="chip chip-100">$100</button>
+      <button class="chip-clear">Clear</button>
+    </div>
+
+    <button class="throw-btn">▸ Throw Pitch</button>
+  </div>
+
+  <a class="back-link" href="/mockups/index.html">← All HUDs</a>
+  <div class="label-tag">V5 · Reels + Pills</div>
+</div>
+</body>
+</html>

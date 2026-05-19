@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HUD V4 · Tactile Chip Stacks</title>
+<style>
+  :root {
+    --bg: #000;
+    --cream: #fff4db;
+    --magenta: #fb009f;
+    --cyan: #2aeaff;
+    --yellow: #ffe054;
+    --muted: rgba(255, 244, 219, 0.62);
+    --rule: rgba(255, 244, 219, 0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100vh; background: var(--bg); color: var(--cream); font-family: 'Montserrat', system-ui, sans-serif; font-weight: 300; overflow-x: hidden; }
+
+  /* ===== Scene shell ===== */
+  .scene { position: relative; min-height: 100vh; width: 100%; overflow: hidden; }
+  .scene-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; z-index: 0; }
+  .field { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 180px 24px 56px; }
+
+  /* Strike zone */
+  .zone-wrap { position: relative; width: min(380px, 70vw); height: min(380px, 70vw); }
+  .zone-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; border: 2px solid rgba(42,234,255,0.7); box-shadow: inset 0 0 20px rgba(42,234,255,0.18), 0 0 18px rgba(42,234,255,0.22); background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(42,234,255,0.04) 3px 4px); }
+  .zone-cell { border-right: 1px solid rgba(42,234,255,0.38); border-bottom: 1px solid rgba(42,234,255,0.38); }
+  .zone-cell:nth-child(3n) { border-right: 0; }
+  .zone-cell:nth-child(n+7) { border-bottom: 0; }
+  .marker { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--cyan); background: rgba(0,0,0,0.7); box-shadow: 0 0 6px rgba(42,234,255,0.65); transform: translate(-50%, -50%); }
+
+  /* Chip rack */
+  .chip-rack { display: flex; gap: 16px; align-items: center; }
+  .chip { width: 56px; height: 56px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22); cursor: pointer; }
+  .chip-1 { background: var(--cream); color: #000; }
+  .chip-5 { background: var(--cyan); color: #000; transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22), 0 0 0 3px rgba(42,234,255,0.5); }
+  .chip-25 { background: var(--magenta); color: var(--cream); }
+  .chip-100 { background: var(--yellow); color: #000; }
+  .chip-clear { background: transparent; border: 1px solid var(--rule); color: var(--muted); padding: 10px 22px; border-radius: 999px; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; }
+  .throw-btn { background: var(--magenta); color: var(--cream); border: 1px solid var(--cream); padding: 16px 36px; border-radius: 999px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; box-shadow: 0 0 24px rgba(251,0,159,0.45); cursor: pointer; }
+
+  /* Footer chrome */
+  .back-link { position: fixed; bottom: 14px; left: 14px; z-index: 20; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+  .label-tag { position: fixed; bottom: 14px; right: 14px; z-index: 20; color: var(--muted); font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+
+  /* ===== V4: Tactile Chip Stacks ===== */
+  .chip-stack {
+    position: fixed;
+    top: 28px;
+    z-index: 10;
+    width: 88px; height: 110px;
+  }
+  .chip-stack.left { left: 32px; }
+  .chip-stack.right { right: 32px; }
+  .cs-eyebrow {
+    position: absolute;
+    bottom: -22px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--cyan);
+    font-size: 9px; font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(42,234,255,0.55);
+    white-space: nowrap;
+  }
+  .cs-disc {
+    position: absolute;
+    left: 6px;
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,0.45);
+    box-shadow:
+      0 3px 0 rgba(0,0,0,0.4),
+      0 5px 8px rgba(0,0,0,0.5);
+  }
+  .cs-disc.l0 { bottom: 0;  background: var(--cream); }
+  .cs-disc.l1 { bottom: 5px; background: var(--cyan); }
+  .cs-disc.l2 { bottom: 10px; background: var(--magenta); border-color: rgba(255,244,219,0.55); }
+  .cs-disc.l3 { bottom: 15px; background: var(--yellow); }
+  .cs-disc.l4 { bottom: 20px; background: var(--cream); }
+  .cs-disc.top {
+    bottom: 25px;
+    background: var(--cream);
+    border: 2px dashed rgba(0,0,0,0.35);
+    box-shadow:
+      0 3px 0 rgba(0,0,0,0.45),
+      0 6px 10px rgba(0,0,0,0.55),
+      inset 0 -3px 0 rgba(0,0,0,0.18),
+      inset 0 0 0 4px rgba(255,255,255,0.4);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #000;
+  }
+  .cs-top-mini {
+    font-size: 7px; font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,0.55);
+    margin-bottom: 1px;
+  }
+  .cs-top-value {
+    font-size: 17px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: #000;
+    line-height: 1;
+  }
+  .chip-stack.empty .cs-disc { display: none; }
+  .chip-stack.empty .cs-disc.top {
+    display: flex;
+    bottom: 22px;
+    background: rgba(255,244,219,0.08);
+    border: 2px dashed rgba(255,244,219,0.4);
+    box-shadow: none;
+    color: var(--muted);
+  }
+  .chip-stack.empty .cs-top-mini { color: rgba(255,244,219,0.5); }
+  .chip-stack.empty .cs-top-value { color: var(--muted); }
+
+  /* Gold medallion */
+  .medallion {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 130px; height: 130px;
+  }
+  .medallion-disc {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 28%, #ffe896 0%, #d49423 38%, #8a5d18 78%, #4a2f0a 100%);
+    border: 4px solid #2a1a0a;
+    box-shadow:
+      0 6px 18px rgba(0,0,0,0.7),
+      0 0 28px rgba(255,224,84,0.45),
+      0 0 56px rgba(251,0,159,0.35),
+      inset 0 0 28px rgba(0,0,0,0.55),
+      inset 0 4px 6px rgba(255,255,255,0.35);
+    animation: medallion-glow 3.6s ease-in-out infinite;
+  }
+  @keyframes medallion-glow {
+    0%, 100% { box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 28px rgba(255,224,84,0.45), 0 0 56px rgba(251,0,159,0.35), inset 0 0 28px rgba(0,0,0,0.55), inset 0 4px 6px rgba(255,255,255,0.35); }
+    50%      { box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 38px rgba(255,224,84,0.7), 0 0 80px rgba(42,234,255,0.4), inset 0 0 28px rgba(0,0,0,0.55), inset 0 4px 6px rgba(255,255,255,0.35); }
+  }
+  @media (prefers-reduced-motion: reduce) { .medallion-disc { animation: none; } }
+
+  .medallion-rim {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  .medallion-rim svg { width: 100%; height: 100%; }
+  .medallion-rim text {
+    fill: #2a1a0a;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 9px;
+    letter-spacing: 0.5em;
+    filter: drop-shadow(0 1px 0 rgba(255,224,84,0.7));
+  }
+
+  .medallion-core {
+    position: absolute;
+    inset: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 28%, #f8c34a 0%, #b07614 60%, #6a4a14 100%);
+    border: 2px solid #4a2f0a;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .medallion-eyebrow {
+    color: #2a1a0a;
+    font-size: 8px; font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255,224,84,0.7);
+    margin-bottom: 2px;
+  }
+  .medallion-value {
+    color: #1a0d05;
+    font-size: 19px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    text-shadow:
+      0 1px 0 rgba(255,224,84,0.85),
+      0 -1px 1px rgba(0,0,0,0.55);
+    line-height: 1;
+  }
+
+  @media (max-width: 700px) {
+    .chip-stack { width: 64px; height: 78px; top: 20px; }
+    .chip-stack.left { left: 14px; }
+    .chip-stack.right { right: 14px; }
+    .cs-disc { left: 4px; width: 56px; height: 56px; }
+    .cs-disc.top { bottom: 18px; }
+    .cs-top-value { font-size: 13px; }
+    .cs-top-mini { font-size: 6px; }
+    .cs-eyebrow { font-size: 8px; bottom: -18px; }
+    .medallion { width: 104px; height: 104px; top: 10px; }
+    .medallion-core { inset: 22px; }
+    .medallion-value { font-size: 15px; }
+    .medallion-eyebrow { font-size: 7px; }
+    .field { padding-top: 160px; }
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <img class="scene-bg" src="/assets/IMG-03.jpg" alt="" aria-hidden="true" />
+
+  <!-- ===== HUD: Tactile Chip Stacks ===== -->
+  <!-- Balance: stack of 5 chips with $1,160 engraved on top -->
+  <div class="chip-stack left" aria-label="Balance: 1160 dollars">
+    <span class="cs-disc l0"></span>
+    <span class="cs-disc l1"></span>
+    <span class="cs-disc l2"></span>
+    <span class="cs-disc l3"></span>
+    <span class="cs-disc l4"></span>
+    <span class="cs-disc top">
+      <span class="cs-top-mini">Balance</span>
+      <span class="cs-top-value">$1,160</span>
+    </span>
+    <span class="cs-eyebrow">★ Pot ★</span>
+  </div>
+
+  <!-- Jackpot: gold medallion -->
+  <div class="medallion" aria-label="Jackpot: 1002 dollars">
+    <div class="medallion-disc"></div>
+    <div class="medallion-rim">
+      <svg viewBox="0 0 130 130">
+        <defs>
+          <path id="med-rim" d="M 65,65 m -50,0 a 50,50 0 1,1 100,0 a 50,50 0 1,1 -100,0" fill="none" />
+        </defs>
+        <text><textPath href="#med-rim" startOffset="0">★ JACKPOT ★ JACKPOT ★ JACKPOT ★</textPath></text>
+      </svg>
+    </div>
+    <div class="medallion-core">
+      <div class="medallion-eyebrow">Pool</div>
+      <div class="medallion-value">$1,002</div>
+    </div>
+  </div>
+
+  <!-- Staked: empty placeholder (would grow to a chip stack as the player bets) -->
+  <div class="chip-stack right empty" aria-label="Staked: 0 dollars">
+    <span class="cs-disc top">
+      <span class="cs-top-mini">Staked</span>
+      <span class="cs-top-value">$0</span>
+    </span>
+    <span class="cs-eyebrow">No bets</span>
+  </div>
+
+  <div class="field">
+    <div class="zone-wrap">
+      <div class="zone-grid">
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+      </div>
+      <span class="marker" style="top:16.67%;left:-7%"></span>
+      <span class="marker" style="top:50%;left:-7%"></span>
+      <span class="marker" style="top:83.33%;left:-7%"></span>
+      <span class="marker" style="left:16.67%;top:-7%"></span>
+      <span class="marker" style="left:50%;top:-7%"></span>
+      <span class="marker" style="left:83.33%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:107%"></span>
+    </div>
+
+    <div class="chip-rack">
+      <button class="chip chip-1">$1</button>
+      <button class="chip chip-5">$5</button>
+      <button class="chip chip-25">$25</button>
+      <button class="chip chip-100">$100</button>
+      <button class="chip-clear">Clear</button>
+    </div>
+
+    <button class="throw-btn">▸ Throw Pitch</button>
+  </div>
+
+  <a class="back-link" href="/mockups/index.html">← All HUDs</a>
+  <div class="label-tag">V4 · Tactile Chip Stacks</div>
+</div>
+</body>
+</html>

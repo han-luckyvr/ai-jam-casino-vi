@@ -112,18 +112,6 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
         }}
       />
 
-      <HudReadout
-        side="left"
-        label="Balance"
-        value={`$${balance.toLocaleString("en-US")}`}
-      />
-      <HudReadout
-        side="right"
-        label="Staked"
-        value={`$${staked.toLocaleString("en-US")}`}
-        valueColor={staked > balance ? "var(--magenta)" : "var(--cream)"}
-      />
-
       <div
         style={{
           position: "relative",
@@ -134,8 +122,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: "32px",
-          padding: "96px 24px 48px",
+          padding: "180px 24px 140px",
           boxSizing: "border-box",
         }}
       >
@@ -145,119 +132,84 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
           onPlaceZone={(cell) => placeBet({ kind: "zone", cell })}
           onPlaceLine={(line) => placeBet({ kind: "line", line })}
         />
+      </div>
 
-        <ChipRack
-          activeChip={state.activeChip}
-          onSelectChip={selectChip}
-          onClear={onClear}
-          canClear={state.bets.length > 0}
-        />
-
-        <button
-          type="button"
-          onClick={onThrowPitch}
-          disabled={!canThrowPitch}
-          style={{
-            background: canThrowPitch ? "var(--magenta)" : "rgba(251,0,159,0.35)",
-            color: "var(--cream)",
-            border: "1px solid var(--cream)",
-            padding: "16px 36px",
-            borderRadius: 999,
-            fontFamily: "var(--font-montserrat), sans-serif",
-            fontWeight: 800,
-            fontSize: 13,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            cursor: canThrowPitch ? "pointer" : "not-allowed",
-            opacity: canThrowPitch ? 1 : 0.55,
-            boxShadow: canThrowPitch ? "0 0 24px rgba(251,0,159,0.45)" : "none",
-            transition: "opacity 0.15s ease, box-shadow 0.15s ease",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          ▸ Throw Pitch{staked > 0 ? ` · $${staked.toLocaleString("en-US")} staked` : ""}
-        </button>
-
-        {tooltip !== null && (
-          <div
-            role="status"
-            aria-live="polite"
+      <div className="bet-dock" aria-label="Player dock">
+        <div className="dock-readout">
+          <span className="dr-label">Balance</span>
+          <span className="dr-value">${balance.toLocaleString("en-US")}</span>
+        </div>
+        <div className="dock-center">
+          <ChipRack
+            activeChip={state.activeChip}
+            onSelectChip={selectChip}
+            onClear={onClear}
+            canClear={state.bets.length > 0}
+          />
+          <button
+            type="button"
+            onClick={onThrowPitch}
+            disabled={!canThrowPitch}
             style={{
-              position: "fixed",
-              left: "50%",
-              bottom: 36,
-              transform: "translateX(-50%)",
-              zIndex: 20,
-              maxWidth: "min(520px, 92vw)",
-              padding: "12px 20px",
-              background: "rgba(12,10,31,0.92)",
-              border: "1px solid var(--magenta)",
-              borderRadius: 8,
+              background: canThrowPitch ? "var(--magenta)" : "rgba(251,0,159,0.35)",
               color: "var(--cream)",
+              border: "1px solid var(--cream)",
+              padding: "14px 30px",
+              borderRadius: 999,
               fontFamily: "var(--font-montserrat), sans-serif",
+              fontWeight: 800,
               fontSize: 12,
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              textAlign: "center",
-              boxShadow: "0 0 18px rgba(251,0,159,0.45)",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              cursor: canThrowPitch ? "pointer" : "not-allowed",
+              opacity: canThrowPitch ? 1 : 0.55,
+              boxShadow: canThrowPitch ? "0 0 24px rgba(251,0,159,0.45)" : "none",
+              transition: "opacity 0.15s ease, box-shadow 0.15s ease",
+              fontVariantNumeric: "tabular-nums",
+              whiteSpace: "nowrap",
             }}
           >
-            {tooltip}
-          </div>
-        )}
+            ▸ Throw Pitch
+          </button>
+        </div>
+        <div className="dock-readout right">
+          <span className="dr-label">Staked</span>
+          <span
+            className="dr-value"
+            style={{ color: staked > balance ? "var(--magenta)" : undefined }}
+          >
+            ${staked.toLocaleString("en-US")}
+          </span>
+        </div>
       </div>
-    </main>
-  );
-}
 
-function HudReadout({
-  side,
-  label,
-  value,
-  valueColor = "var(--cream)",
-}: {
-  side: "left" | "right";
-  label: string;
-  value: string;
-  valueColor?: string;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 18,
-        [side]: 20,
-        zIndex: 9,
-        display: "flex",
-        alignItems: "baseline",
-        gap: 8,
-        fontFamily: "var(--font-montserrat), sans-serif",
-        textShadow: "0 2px 6px rgba(0,0,0,0.7)",
-        pointerEvents: "none",
-      }}
-    >
-      <span
-        style={{
-          color: "var(--muted)",
-          fontWeight: 700,
-          fontSize: 10,
-          letterSpacing: "0.22em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          color: valueColor,
-          fontWeight: 800,
-          fontSize: 15,
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.04em",
-        }}
-      >
-        {value}
-      </span>
-    </div>
+      {tooltip !== null && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: "fixed",
+            left: "50%",
+            bottom: 116,
+            transform: "translateX(-50%)",
+            zIndex: 20,
+            maxWidth: "min(520px, 92vw)",
+            padding: "12px 20px",
+            background: "rgba(12,10,31,0.92)",
+            border: "1px solid var(--magenta)",
+            borderRadius: 8,
+            color: "var(--cream)",
+            fontFamily: "var(--font-montserrat), sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            textAlign: "center",
+            boxShadow: "0 0 18px rgba(251,0,159,0.45)",
+          }}
+        >
+          {tooltip}
+        </div>
+      )}
+    </main>
   );
 }

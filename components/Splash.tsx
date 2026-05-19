@@ -1,11 +1,12 @@
 "use client";
 
-import { useBalance } from "@/lib/persistence";
+import { useBalance, useMuted } from "@/lib/persistence";
 
 type Props = { onTap: () => void };
 
 export default function Splash({ onTap }: Props) {
   const [balance] = useBalance();
+  const [muted, setMuted] = useMuted();
 
   return (
     <main
@@ -134,9 +135,11 @@ export default function Splash({ onTap }: Props) {
       </div>
 
       <button
-        aria-label="Settings"
+        aria-label={muted ? "Unmute sound" : "Mute sound"}
+        aria-pressed={muted}
         onClick={(e) => {
           e.stopPropagation();
+          setMuted((m) => !m);
         }}
         style={{
           position: "absolute",
@@ -146,7 +149,7 @@ export default function Splash({ onTap }: Props) {
           background: "transparent",
           border: "none",
           padding: 0,
-          color: "var(--muted)",
+          color: muted ? "var(--muted)" : "var(--cream)",
           fontFamily: "var(--font-montserrat), sans-serif",
           fontWeight: 700,
           fontSize: "12px",
@@ -156,7 +159,7 @@ export default function Splash({ onTap }: Props) {
           cursor: "pointer",
         }}
       >
-        ⚙ Settings
+        {muted ? "🔇 Muted" : "🔊 Sound"}
       </button>
     </main>
   );

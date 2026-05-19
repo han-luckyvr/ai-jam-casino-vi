@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HUD V2 · Vegas Marquee + Bottom Dock</title>
+<style>
+  :root {
+    --bg: #000;
+    --cream: #fff4db;
+    --magenta: #fb009f;
+    --cyan: #2aeaff;
+    --yellow: #ffe054;
+    --muted: rgba(255, 244, 219, 0.62);
+    --rule: rgba(255, 244, 219, 0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100vh; background: var(--bg); color: var(--cream); font-family: 'Montserrat', system-ui, sans-serif; font-weight: 300; overflow-x: hidden; }
+
+  /* ===== Scene shell ===== */
+  .scene { position: relative; min-height: 100vh; width: 100%; overflow: hidden; }
+  .scene-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; z-index: 0; }
+  .field { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 180px 24px 140px; }
+
+  /* Strike zone silhouette */
+  .zone-wrap { position: relative; width: min(380px, 70vw); height: min(380px, 70vw); }
+  .zone-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    width: 100%; height: 100%;
+    border: 2px solid rgba(42,234,255,0.7);
+    box-shadow: inset 0 0 20px rgba(42,234,255,0.18), 0 0 18px rgba(42,234,255,0.22);
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, rgba(42,234,255,0.04) 3px 4px);
+  }
+  .zone-cell { border-right: 1px solid rgba(42,234,255,0.38); border-bottom: 1px solid rgba(42,234,255,0.38); }
+  .zone-cell:nth-child(3n) { border-right: 0; }
+  .zone-cell:nth-child(n+7) { border-bottom: 0; }
+  .marker { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--cyan); background: rgba(0,0,0,0.7); box-shadow: 0 0 6px rgba(42,234,255,0.65); transform: translate(-50%, -50%); }
+
+  /* Chip rack — lives inside the dock for V2 */
+  .chip { width: 52px; height: 52px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22); cursor: pointer; }
+  .chip-1 { background: var(--cream); color: #000; }
+  .chip-5 { background: var(--cyan); color: #000; transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,0.55), inset 0 -4px 0 rgba(0,0,0,0.22), 0 0 0 3px rgba(42,234,255,0.5); }
+  .chip-25 { background: var(--magenta); color: var(--cream); }
+  .chip-100 { background: var(--yellow); color: #000; }
+  .chip-clear { background: transparent; border: 1px solid var(--rule); color: var(--muted); padding: 8px 18px; border-radius: 999px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; font-family: 'Montserrat', sans-serif; cursor: pointer; }
+  .throw-btn { background: var(--magenta); color: var(--cream); border: 1px solid var(--cream); padding: 14px 30px; border-radius: 999px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; box-shadow: 0 0 24px rgba(251,0,159,0.45); cursor: pointer; white-space: nowrap; }
+
+  /* Footer chrome */
+  .back-link { position: fixed; bottom: 102px; left: 14px; z-index: 20; color: var(--muted); text-decoration: none; font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+  .label-tag { position: fixed; bottom: 102px; right: 14px; z-index: 20; color: var(--muted); font-weight: 700; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--rule); border-radius: 6px; background: rgba(12,10,31,0.7); backdrop-filter: blur(4px); }
+
+  /* ===== V2: Vegas Marquee ===== */
+  .marquee {
+    position: fixed;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: min(680px, 92vw);
+    background: linear-gradient(180deg, #0a0a14 0%, #03030a 100%);
+    border: 2px solid #1a1a2e;
+    border-radius: 14px;
+    padding: 22px 36px 18px;
+    box-shadow:
+      0 0 0 3px #0a0a14,
+      0 0 0 5px rgba(251,0,159,0.75),
+      0 0 24px rgba(251,0,159,0.45),
+      0 0 0 7px rgba(42,234,255,0.6),
+      0 0 36px rgba(42,234,255,0.32);
+  }
+  .marquee-dot-rail {
+    position: absolute;
+    left: 14px; right: 14px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .marquee-dot-rail.top { top: 4px; }
+  .marquee-dot-rail.bottom { bottom: 4px; }
+  .m-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    animation: m-chase 1.4s linear infinite;
+  }
+  @keyframes m-chase {
+    0%, 100% { background: rgba(255,255,255,0.2); box-shadow: none; }
+    25%      { background: var(--yellow); box-shadow: 0 0 6px var(--yellow), 0 0 12px rgba(255,224,84,0.5); }
+    50%      { background: var(--magenta); box-shadow: 0 0 6px var(--magenta), 0 0 12px rgba(251,0,159,0.5); }
+    75%      { background: var(--cyan); box-shadow: 0 0 6px var(--cyan), 0 0 12px rgba(42,234,255,0.5); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .m-dot { animation: none; background: rgba(255,224,84,0.7); box-shadow: 0 0 5px rgba(255,224,84,0.6); }
+  }
+  .marquee-eyebrow {
+    color: var(--cyan); font-weight: 800;
+    font-size: 10px; letter-spacing: 0.36em; text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 6px;
+    text-shadow: 0 0 8px rgba(42,234,255,0.65);
+  }
+  .marquee-value {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 48px; letter-spacing: 0.04em;
+    color: var(--cream);
+    text-align: center;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    text-shadow:
+      0 0 12px rgba(251,0,159,0.95),
+      0 0 28px rgba(251,0,159,0.6),
+      0 0 4px rgba(42,234,255,0.85),
+      0 0 18px rgba(42,234,255,0.5);
+  }
+
+  /* ===== V2: Bottom Dock ===== */
+  .dock {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    z-index: 10;
+    height: 96px;
+    background: linear-gradient(180deg, rgba(12,10,31,0.85) 0%, rgba(0,0,0,0.95) 100%);
+    border-top: 1px solid rgba(42,234,255,0.55);
+    box-shadow: 0 -2px 24px rgba(42,234,255,0.2);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 32px;
+    gap: 18px;
+    backdrop-filter: blur(8px);
+  }
+  .dock-readout {
+    display: flex; flex-direction: column; gap: 4px;
+    font-family: 'Montserrat', sans-serif;
+    min-width: 0;
+  }
+  .dock-readout.right { align-items: flex-end; }
+  .dock-readout .dr-label {
+    color: var(--cyan);
+    font-size: 10px; font-weight: 800; letter-spacing: 0.24em;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(42,234,255,0.55);
+  }
+  .dock-readout .dr-value {
+    color: var(--cream);
+    font-size: 28px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    text-shadow: 0 0 12px rgba(255,244,219,0.4);
+    line-height: 1;
+  }
+  .dock-center {
+    display: flex; align-items: center; gap: 18px;
+  }
+
+  @media (max-width: 700px) {
+    .marquee { padding: 16px 24px 12px; }
+    .marquee-value { font-size: 34px; }
+    .marquee-eyebrow { font-size: 9px; letter-spacing: 0.3em; }
+    .dock { height: 88px; padding: 0 14px; gap: 10px; grid-template-columns: auto 1fr auto; }
+    .dock-readout .dr-value { font-size: 18px; }
+    .dock-readout .dr-label { font-size: 9px; letter-spacing: 0.2em; }
+    .dock-center { gap: 10px; }
+    .chip { width: 42px; height: 42px; font-size: 11px; }
+    .chip-clear { display: none; }
+    .throw-btn { padding: 10px 16px; font-size: 11px; letter-spacing: 0.14em; }
+    .back-link, .label-tag { bottom: 92px; }
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <img class="scene-bg" src="/assets/IMG-03.jpg" alt="" aria-hidden="true" />
+
+  <!-- ===== HUD: Top Marquee ===== -->
+  <div class="marquee" aria-label="Progressive jackpot">
+    <div class="marquee-dot-rail top">
+      <span class="m-dot" style="animation-delay:0s"></span>
+      <span class="m-dot" style="animation-delay:0.08s"></span>
+      <span class="m-dot" style="animation-delay:0.16s"></span>
+      <span class="m-dot" style="animation-delay:0.24s"></span>
+      <span class="m-dot" style="animation-delay:0.32s"></span>
+      <span class="m-dot" style="animation-delay:0.4s"></span>
+      <span class="m-dot" style="animation-delay:0.48s"></span>
+      <span class="m-dot" style="animation-delay:0.56s"></span>
+      <span class="m-dot" style="animation-delay:0.64s"></span>
+      <span class="m-dot" style="animation-delay:0.72s"></span>
+      <span class="m-dot" style="animation-delay:0.8s"></span>
+      <span class="m-dot" style="animation-delay:0.88s"></span>
+      <span class="m-dot" style="animation-delay:0.96s"></span>
+      <span class="m-dot" style="animation-delay:1.04s"></span>
+      <span class="m-dot" style="animation-delay:1.12s"></span>
+      <span class="m-dot" style="animation-delay:1.2s"></span>
+      <span class="m-dot" style="animation-delay:1.28s"></span>
+      <span class="m-dot" style="animation-delay:1.36s"></span>
+    </div>
+    <div class="marquee-dot-rail bottom">
+      <span class="m-dot" style="animation-delay:1.36s"></span>
+      <span class="m-dot" style="animation-delay:1.28s"></span>
+      <span class="m-dot" style="animation-delay:1.2s"></span>
+      <span class="m-dot" style="animation-delay:1.12s"></span>
+      <span class="m-dot" style="animation-delay:1.04s"></span>
+      <span class="m-dot" style="animation-delay:0.96s"></span>
+      <span class="m-dot" style="animation-delay:0.88s"></span>
+      <span class="m-dot" style="animation-delay:0.8s"></span>
+      <span class="m-dot" style="animation-delay:0.72s"></span>
+      <span class="m-dot" style="animation-delay:0.64s"></span>
+      <span class="m-dot" style="animation-delay:0.56s"></span>
+      <span class="m-dot" style="animation-delay:0.48s"></span>
+      <span class="m-dot" style="animation-delay:0.4s"></span>
+      <span class="m-dot" style="animation-delay:0.32s"></span>
+      <span class="m-dot" style="animation-delay:0.24s"></span>
+      <span class="m-dot" style="animation-delay:0.16s"></span>
+      <span class="m-dot" style="animation-delay:0.08s"></span>
+      <span class="m-dot" style="animation-delay:0s"></span>
+    </div>
+    <div class="marquee-eyebrow">▾ Progressive Jackpot ▾</div>
+    <div class="marquee-value">$1,002</div>
+  </div>
+
+  <div class="field">
+    <div class="zone-wrap">
+      <div class="zone-grid">
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+        <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
+      </div>
+      <span class="marker" style="top:16.67%;left:-7%"></span>
+      <span class="marker" style="top:50%;left:-7%"></span>
+      <span class="marker" style="top:83.33%;left:-7%"></span>
+      <span class="marker" style="left:16.67%;top:-7%"></span>
+      <span class="marker" style="left:50%;top:-7%"></span>
+      <span class="marker" style="left:83.33%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:-7%"></span>
+      <span class="marker" style="left:107%;top:107%"></span>
+    </div>
+  </div>
+
+  <!-- ===== HUD: Bottom Dock ===== -->
+  <div class="dock" aria-label="Player dock">
+    <div class="dock-readout">
+      <div class="dr-label">Balance</div>
+      <div class="dr-value">$1,160</div>
+    </div>
+    <div class="dock-center">
+      <button class="chip chip-1">$1</button>
+      <button class="chip chip-5">$5</button>
+      <button class="chip chip-25">$25</button>
+      <button class="chip chip-100">$100</button>
+      <button class="chip-clear">Clear</button>
+      <button class="throw-btn">▸ Throw Pitch</button>
+    </div>
+    <div class="dock-readout right">
+      <div class="dr-label">Staked</div>
+      <div class="dr-value">$0</div>
+    </div>
+  </div>
+
+  <a class="back-link" href="/mockups/index.html">← All HUDs</a>
+  <div class="label-tag">V2 · Marquee + Dock</div>
+</div>
+</body>
+</html>

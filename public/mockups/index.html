@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HUD Mockups · Choose One</title>
+<style>
+  :root {
+    --bg: #000;
+    --panel: #0a081b;
+    --cream: #fff4db;
+    --magenta: #fb009f;
+    --cyan: #2aeaff;
+    --yellow: #ffe054;
+    --purple: #9500c6;
+    --muted: rgba(255, 244, 219, 0.62);
+    --rule: rgba(255, 244, 219, 0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; min-height: 100vh; }
+  body {
+    background:
+      radial-gradient(900px 600px at 85% -10%, rgba(149,0,198,0.22), transparent 60%),
+      radial-gradient(800px 500px at 0% 110%, rgba(251,0,159,0.18), transparent 65%),
+      radial-gradient(700px 500px at 50% 50%, rgba(42,234,255,0.06), transparent 70%),
+      var(--bg);
+    color: var(--cream);
+    font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-weight: 300;
+    padding: 64px 32px 80px;
+    background-attachment: fixed;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px; font-weight: 800;
+    letter-spacing: 0.24em; text-transform: uppercase;
+    margin: 0 0 8px;
+    text-shadow: 0 0 16px rgba(42,234,255,0.4);
+  }
+  .subtitle {
+    text-align: center; color: var(--muted);
+    font-size: 13px; max-width: 640px; margin: 0 auto 56px;
+    letter-spacing: 0.02em; line-height: 1.55;
+  }
+  .grid {
+    max-width: 1200px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    display: block;
+    background: rgba(12,10,31,0.7);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    color: var(--cream);
+    text-decoration: none;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--cyan);
+    box-shadow: 0 8px 28px rgba(42,234,255,0.25);
+  }
+  .card-preview {
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(135deg, #1a0d2a 0%, #0a0817 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-body { padding: 18px 20px 22px; }
+  .card-num {
+    color: var(--cyan); font-weight: 800;
+    font-size: 10px; letter-spacing: 0.28em;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(42,234,255,0.55);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 800;
+    letter-spacing: 0.04em;
+    margin: 4px 0 8px;
+  }
+  .card-tagline {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Mini previews */
+  .preview-v1 {
+    color: #ff8c1a;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 6px rgba(255,140,26,0.9), 0 0 14px rgba(255,140,26,0.5);
+    background: #0d0d0d;
+    border: 1px solid #444;
+    padding: 12px 22px;
+    border-radius: 4px;
+    box-shadow: inset 0 0 24px rgba(0,0,0,0.9);
+  }
+  .preview-v2 {
+    background: linear-gradient(180deg, #0a0a14 0%, #03030a 100%);
+    border: 2px solid #1a1a2e;
+    border-radius: 10px;
+    padding: 12px 22px;
+    box-shadow: 0 0 0 2px rgba(251,0,159,0.7), 0 0 0 4px rgba(42,234,255,0.6), 0 0 24px rgba(251,0,159,0.4);
+    color: var(--cream);
+    font-size: 24px;
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(251,0,159,0.7), 0 0 12px rgba(42,234,255,0.5);
+  }
+  .preview-v3 {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(42,234,255,0.18) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(251,0,159,0.18) 0%, transparent 50%),
+                radial-gradient(circle at center, rgba(12,10,31,0.95) 0%, rgba(0,0,0,1) 100%);
+    border: 2px solid rgba(42,234,255,0.6);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream);
+    font-size: 16px;
+    font-weight: 800;
+    box-shadow: inset 0 0 14px rgba(42,234,255,0.18), 0 0 20px rgba(251,0,159,0.4);
+  }
+  .preview-v4 {
+    width: 92px; height: 92px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffe178 0%, #d49423 40%, #6a4a14 90%);
+    border: 3px solid #2a1a0a;
+    display: flex; align-items: center; justify-content: center;
+    color: #1a0d05;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.55), 0 0 22px rgba(255,224,84,0.4), inset 0 0 12px rgba(0,0,0,0.3);
+  }
+  .preview-v5 {
+    display: flex; gap: 3px; align-items: center;
+    background: linear-gradient(180deg, #5a5a5a 0%, #2a2a2a 60%, #4a4a4a 100%);
+    border: 2px solid #1a1a1a;
+    border-radius: 6px;
+    padding: 8px 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 12px rgba(0,0,0,0.6);
+  }
+  .preview-v5-digit {
+    width: 20px; height: 28px;
+    background: #050505;
+    border: 1px solid #1a1a1a;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream);
+    font-size: 19px;
+    font-weight: 800;
+    text-shadow: 0 0 6px rgba(255,244,219,0.7);
+  }
+  .preview-v5-symbol {
+    color: var(--yellow);
+    font-size: 16px;
+    font-weight: 800;
+    padding: 0 1px;
+  }
+
+  .hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-top: 56px;
+  }
+</style>
+</head>
+<body>
+  <h1>HUD Redesign · Choose One</h1>
+  <p class="subtitle">Five takes on how to present <em>Balance</em>, <em>Staked</em>, and <em>Jackpot</em>. Each leans into a different casino-game vocabulary — sports book, slot floor, roulette, felt table, mechanical reels.</p>
+
+  <div class="grid">
+    <a class="card" href="/mockups/hud-v1-scoreboard.html">
+      <div class="card-preview"><div class="preview-v1">$1,002</div></div>
+      <div class="card-body">
+        <div class="card-num">V1 · Sports book</div>
+        <div class="card-title">Stadium Scoreboard</div>
+        <div class="card-tagline">Full-width LED scoreboard pinned to the top. Daktronics-style orange/red 7-segment digits, chasing bulbs around the jackpot. Leans hard into the baseball theme.</div>
+      </div>
+    </a>
+    <a class="card" href="/mockups/hud-v2-marquee-dock.html">
+      <div class="card-preview"><div class="preview-v2">$1,002</div></div>
+      <div class="card-body">
+        <div class="card-num">V2 · Slot floor</div>
+        <div class="card-title">Vegas Marquee + Bottom Dock</div>
+        <div class="card-tagline">Slot-marquee jackpot with chasing perimeter lights. Balance + Staked move to a bottom dock beside the chips and Throw button — where your hand actually is.</div>
+      </div>
+    </a>
+    <a class="card" href="/mockups/hud-v3-roulette-hub.html">
+      <div class="card-preview"><div class="preview-v3">$1,002</div></div>
+      <div class="card-body">
+        <div class="card-num">V3 · Roulette</div>
+        <div class="card-title">Roulette Hub</div>
+        <div class="card-tagline">A circular hub at the top — rotating outer ring, engraved JACKPOT rim, neon value in the center. Balance + Staked become small satellite pills wired to the hub.</div>
+      </div>
+    </a>
+    <a class="card" href="/mockups/hud-v4-tactile-chips.html">
+      <div class="card-preview"><div class="preview-v4">JACKPOT</div></div>
+      <div class="card-body">
+        <div class="card-num">V4 · Felt table</div>
+        <div class="card-title">Tactile Chip Stacks</div>
+        <div class="card-tagline">Physical metaphor — Balance is a literal stack of chips, Staked grows visually as you bet, Jackpot is an embossed gold medallion. Reinforces real-money wagering.</div>
+      </div>
+    </a>
+    <a class="card" href="/mockups/hud-v5-reels-pills.html">
+      <div class="card-preview">
+        <div class="preview-v5">
+          <span class="preview-v5-symbol">$</span>
+          <div class="preview-v5-digit">1</div>
+          <span class="preview-v5-symbol">,</span>
+          <div class="preview-v5-digit">0</div>
+          <div class="preview-v5-digit">0</div>
+          <div class="preview-v5-digit">2</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-num">V5 · Slot mechanical</div>
+        <div class="card-title">Mechanical Reels + Brushed-Metal Pills</div>
+        <div class="card-tagline">Same positions as today, but every element gets a luxury upgrade. Brushed-metal pills for Balance/Staked, odometer-style digits for the Jackpot. Lowest-risk port.</div>
+      </div>
+    </a>
+  </div>
+
+  <p class="hint">Open each in a new tab — compare side-by-side</p>
+</body>
+</html>
