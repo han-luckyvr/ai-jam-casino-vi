@@ -14,11 +14,6 @@ type Props = {
   dispatch: React.Dispatch<GameAction>;
 };
 
-// Per product-doc.html:457-462 — a line bet stakes 3× chip (one per covered cell).
-function stakeForBet(kind: Bet["kind"], chip: number): number {
-  return kind === "line" ? 3 * chip : chip;
-}
-
 export default function R1BetPlacement({ state, dispatch }: Props) {
   const [balance, setBalance] = useBalance();
   const [, setJackpot] = useJackpot();
@@ -40,8 +35,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
   };
 
   const placeBet = (next: { kind: "zone"; cell: number } | { kind: "line"; line: number }) => {
-    const chip = state.activeChip;
-    const stake = stakeForBet(next.kind, chip);
+    const stake = state.activeChip;
     if (staked + stake > balance) {
       flash(`Not enough balance — $${(staked + stake).toLocaleString("en-US")} would exceed $${balance.toLocaleString("en-US")}`);
       return;

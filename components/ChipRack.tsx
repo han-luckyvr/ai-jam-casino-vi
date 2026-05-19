@@ -116,13 +116,6 @@ function ChipFace({ value, bg, fg }: { value: ChipValue; bg: string; fg: string 
         strokeDasharray="2 3"
       />
       <circle cx="28" cy="28" r="17" fill={`url(#${bevelId})`} />
-      <path
-        d="M -14 0 C -14 -10, -4 -10, 0 0 C 4 10, 14 10, 14 0 C 14 -10, 4 -10, 0 0 C -4 10, -14 10, -14 0 Z"
-        transform="translate(28 28) scale(0.7)"
-        fill="none"
-        stroke="rgba(255,255,255,0.65)"
-        strokeWidth="1.5"
-      />
       <text
         x="28"
         y="28"

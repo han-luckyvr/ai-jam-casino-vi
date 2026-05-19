@@ -41,18 +41,18 @@ const CARDS: ReadonlyArray<CardSpec> = [
   {
     option: 1,
     title: "Contact",
-    risk: "Low risk · 95% RTP",
+    risk: "Low risk",
     color: "var(--cyan)",
     glow: "rgba(42, 234, 255, 0.55)",
     rows: [
-      { label: "Single", probPct: "76%", payout: payoutFor(1.25), emphasis: "primary" },
-      { label: "Out",    probPct: "24%", payout: () => "—",       emphasis: "muted" },
+      { label: "Single", probPct: "95%", payout: payoutFor(1), emphasis: "primary" },
+      { label: "Out",    probPct: "5%",  payout: () => "—",   emphasis: "muted" },
     ],
   },
   {
     option: 2,
     title: "Power",
-    risk: "Mid risk · 95% RTP",
+    risk: "Mid risk",
     color: "var(--magenta)",
     glow: "rgba(251, 0, 159, 0.55)",
     rows: [
@@ -69,14 +69,14 @@ const CARDS: ReadonlyArray<CardSpec> = [
     glow: "rgba(149, 0, 198, 0.55)",
     rows: [
       {
-        label: "HR",
-        probPct: "0.5%",
+        label: "Home Run",
+        probPct: "0.1%",
         payout: (_stake, jackpot) => fmt(jackpot),
         emphasis: "primary",
       },
-      { label: "Triple", probPct: "10%",   payout: payoutFor(3), emphasis: "secondary" },
-      { label: "Double", probPct: "8%",    payout: payoutFor(2), emphasis: "secondary" },
-      { label: "Out",    probPct: "81.5%", payout: () => "—",    emphasis: "muted"     },
+      { label: "Triple", probPct: "12%",   payout: payoutFor(3), emphasis: "primary"   },
+      { label: "Double", probPct: "10%",   payout: payoutFor(2), emphasis: "secondary" },
+      { label: "Out",    probPct: "77.9%", payout: () => "—",    emphasis: "muted"     },
     ],
   },
 ];

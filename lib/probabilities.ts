@@ -30,8 +30,8 @@ export function rollPitch(): PitchOutcome {
 type SwingTable = ReadonlyArray<readonly [R2OutcomeKind, number, number]>;
 
 const OPT_1: SwingTable = [
-  ["single", 0.76, 1.25],
-  ["out", 0.24, 0],
+  ["single", 0.95, 1.0],
+  ["out", 0.05, 0],
 ];
 
 const OPT_2: SwingTable = [
@@ -41,10 +41,10 @@ const OPT_2: SwingTable = [
 ];
 
 const OPT_3: SwingTable = [
-  ["hr", 0.005, 0],
-  ["triple", 0.1, 3.0],
-  ["double", 0.08, 2.0],
-  ["out", 0.815, 0],
+  ["hr", 0.001, 0],
+  ["triple", 0.12, 3.0],
+  ["double", 0.10, 2.0],
+  ["out", 0.779, 0],
 ];
 
 const SWING_TABLES: Record<SwingOption, SwingTable> = {
