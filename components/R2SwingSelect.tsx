@@ -195,6 +195,7 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
         </header>
 
         <div
+          className="swing-card-row"
           style={{
             display: "flex",
             flexWrap: "wrap",
@@ -263,6 +264,7 @@ function SwingCard({
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
+      className="swing-card"
       style={{
         position: "relative",
         flex: "1 1 240px",

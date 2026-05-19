@@ -200,6 +200,41 @@ a {
   }
 }
 
+@keyframes ticker-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 12px rgba(251, 0, 159, 0.95),
+      0 0 28px rgba(251, 0, 159, 0.6),
+      0 0 4px rgba(42, 234, 255, 0.85),
+      0 0 18px rgba(42, 234, 255, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(251, 0, 159, 1),
+      0 0 42px rgba(251, 0, 159, 0.8),
+      0 0 8px rgba(42, 234, 255, 1),
+      0 0 26px rgba(42, 234, 255, 0.7);
+  }
+}
+.marquee-value:not(.jackpot-pulse) {
+  animation: ticker-glow 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-value:not(.jackpot-pulse) {
+    animation: none;
+  }
+}
+
+.outcome-stamp {
+  display: inline-block;
+  animation: win-burst-in 0.55s cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .outcome-stamp {
+    animation: none;
+  }
+}
+
 /* ===== HUD V2: Marquee jackpot + bottom dock ===== */
 
 .jackpot-marquee {
@@ -209,7 +244,9 @@ a {
   transform: translateX(-50%);
   z-index: 10;
   width: min(680px, 92vw);
-  background: linear-gradient(180deg, #0a0a14 0%, #03030a 100%);
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='28' viewBox='0 0 24 28'><polygon points='12,2 22,8 22,20 12,26 2,20 2,8' fill='none' stroke='%232aeaff' stroke-opacity='0.08' stroke-width='1'/></svg>") repeat,
+    linear-gradient(180deg, #0a0a14 0%, #03030a 100%);
   border: 2px solid #1a1a2e;
   border-radius: 14px;
   padding: 22px 36px 18px;
@@ -358,5 +395,93 @@ a {
   }
   .dock-center {
     gap: 10px;
+  }
+}
+
+/* ===== Responsive layouts (M7.5) =====
+   Inline component styles take priority over CSS, so portrait/landscape
+   overrides use !important to win specificity. Existing 700px marquee
+   rules above stay scoped to the HUD chrome. */
+
+@media (max-width: 760px) {
+  .splash-logo {
+    max-width: min(60vw, 320px) !important;
+  }
+  .strike-zone {
+    width: min(85vw, 380px) !important;
+  }
+  .chip-rack-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px !important;
+    justify-items: center;
+  }
+  .swing-card-row {
+    flex-direction: column !important;
+    align-items: center;
+    gap: 16px !important;
+  }
+  .swing-card {
+    flex: 0 0 auto !important;
+    width: min(85vw, 320px) !important;
+    max-width: min(85vw, 320px) !important;
+    min-height: 220px !important;
+  }
+  .outcome-stamp {
+    max-width: min(85vw, 360px);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .splash-logo {
+    max-height: 35vh !important;
+    max-width: min(420px, 50vw) !important;
+  }
+  .r1-bet-content {
+    padding: 56px 24px 24px !important;
+  }
+  .chip-rack-row {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 14px !important;
+  }
+  .swing-card-row {
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    gap: 10px !important;
+  }
+  .swing-card {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    max-width: min(32vw, 220px) !important;
+    min-height: 180px !important;
+    padding: 18px 14px 14px !important;
+  }
+}
+
+/* ===== Screen transition wipe ===== */
+
+@keyframes neon-wipe {
+  0%   { transform: translateX(-110%) skewX(-12deg); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateX(150%) skewX(-12deg); opacity: 0; }
+}
+.screen-wipe-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(42, 234, 255, 0.25) 35%,
+    rgba(251, 0, 159, 0.25) 65%,
+    transparent 100%
+  );
+  animation: neon-wipe 320ms ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen-wipe-overlay {
+    display: none;
   }
 }

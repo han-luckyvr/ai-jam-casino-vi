@@ -64,6 +64,7 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
       }}
     >
       <video
+        className="r1-pitch-video"
         src="/assets/VID-01.mp4"
         autoPlay
         playsInline

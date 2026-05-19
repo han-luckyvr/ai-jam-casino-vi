@@ -95,6 +95,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
       />
 
       <div
+        className="r1-bet-content"
         style={{
           position: "relative",
           zIndex: 2,

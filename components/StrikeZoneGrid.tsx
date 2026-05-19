@@ -93,6 +93,7 @@ export default function StrikeZoneGrid({ bets, activeChip, onPlaceZone, onPlaceL
 
   return (
     <div
+      className="strike-zone"
       style={{
         position: "relative",
         width: "min(60vw, 380px)",

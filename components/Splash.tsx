@@ -56,6 +56,7 @@ export default function Splash({ onTap }: Props) {
         <img
           src="/assets/IMG-06.png"
           alt="Strike Zone: Ducks at Bat"
+          className="splash-logo"
           style={{
             position: "absolute",
             top: "max(14vh, 96px)",
