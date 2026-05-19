@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { resolveR1Payout } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
+import { useSfx } from "@/lib/audio";
 import type { GameAction, GameState } from "@/lib/gameState";
 
 type Props = {
@@ -11,10 +12,13 @@ type Props = {
 };
 
 const FALLBACK_MS = 5000;
+const WHOOSH_DELAY_MS = 1000;
 
 export default function R1PitchVideo({ state, dispatch }: Props) {
   const [, setBalance] = useBalance();
   const resolvedRef = useRef(false);
+  const playWhoosh = useSfx("whoosh");
+  const whooshTimerRef = useRef<number | null>(null);
 
   const resolve = useCallback(() => {
     if (resolvedRef.current) return;
@@ -32,6 +36,23 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
     return () => window.clearTimeout(id);
   }, [resolve]);
 
+  useEffect(() => {
+    return () => {
+      if (whooshTimerRef.current !== null) {
+        window.clearTimeout(whooshTimerRef.current);
+        whooshTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  const onVideoPlay = () => {
+    if (whooshTimerRef.current !== null) return;
+    whooshTimerRef.current = window.setTimeout(() => {
+      playWhoosh();
+      whooshTimerRef.current = null;
+    }, WHOOSH_DELAY_MS);
+  };
+
   return (
     <main
       style={{
@@ -47,6 +68,7 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
         autoPlay
         playsInline
         muted
+        onPlay={onVideoPlay}
         onEnded={resolve}
         onError={resolve}
         style={{

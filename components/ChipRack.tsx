@@ -6,7 +6,7 @@ const CHIPS: ReadonlyArray<{ value: ChipValue; bg: string; fg: string }> = [
   { value: 1, bg: "var(--cream)", fg: "var(--bg)" },
   { value: 5, bg: "var(--cyan)", fg: "var(--bg)" },
   { value: 25, bg: "var(--magenta)", fg: "var(--cream)" },
-  { value: 100, bg: "var(--yellow)", fg: "var(--bg)" },
+  { value: 100, bg: "var(--bg)", fg: "var(--cream)" },
 ];
 
 type Props = {

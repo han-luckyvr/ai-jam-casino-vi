@@ -1,8 +1,14 @@
 "use client";
 
+import { useMemo } from "react";
 import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
-import type { GameAction, GameState, R2OutcomeKind } from "@/lib/gameState";
+import type {
+  GameAction,
+  GameState,
+  R2OutcomeKind,
+  SwingOption,
+} from "@/lib/gameState";
 import OutcomeStamp from "./OutcomeStamp";
 import Confetti from "./Confetti";
 
@@ -28,19 +34,31 @@ const FIRE_CONFETTI: ReadonlyArray<R2OutcomeKind> = [
   "hr",
 ];
 
+const OUT_TEXT_BY_SWING: Record<SwingOption, readonly string[]> = {
+  1: ["Ground out"],
+  2: ["Ground out", "Fly out"],
+  3: ["Fly out"],
+};
+
 export default function R2Resolve({ state, dispatch }: Props) {
   const [balance] = useBalance();
   const outcome = state.r2Outcome;
-  const r1Winnings = state.r1Winnings;
   const r2Winnings = state.lastHandWinnings;
-  const totalHand = r1Winnings + r2Winnings;
   const stake = sumStaked(state.bets);
+
+  const isWin = outcome !== null && outcome.kind !== "out";
+  const swingChoice = state.swingChoice;
+  const outText = useMemo(() => {
+    if (isWin) return null;
+    const options = swingChoice ? OUT_TEXT_BY_SWING[swingChoice] : null;
+    if (!options || options.length === 0) return "Out";
+    return options[Math.floor(Math.random() * options.length)];
+  }, [isWin, swingChoice]);
 
   if (outcome === null) {
     return null;
   }
 
-  const isWin = outcome.kind !== "out";
   const showConfetti = FIRE_CONFETTI.includes(outcome.kind);
 
   return (
@@ -129,31 +147,7 @@ export default function R2Resolve({ state, dispatch }: Props) {
                 : undefined,
             }}
           >
-            {isWin ? `+${fmt(r2Winnings)}` : "No hit"}
-          </p>
-          <p
-            style={{
-              margin: 0,
-              color: "var(--muted)",
-              fontWeight: 600,
-              fontSize: 12,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-            }}
-          >
-            This hand · R1 +{fmt(r1Winnings)} · R2 +{fmt(r2Winnings)} · Total +{fmt(totalHand)}
-          </p>
-          <p
-            style={{
-              margin: 0,
-              color: "var(--muted)",
-              fontWeight: 600,
-              fontSize: 11,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-            }}
-          >
-            Balance · {fmt(balance)}
+            {isWin ? `+${fmt(r2Winnings)}` : outText}
           </p>
         </div>
 

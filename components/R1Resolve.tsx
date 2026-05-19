@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
+import { useSfx } from "@/lib/audio";
 import type { GameAction, GameState } from "@/lib/gameState";
 
 type Props = {
@@ -15,6 +17,11 @@ export default function R1Resolve({ state, dispatch }: Props) {
   const outcome = state.pitchOutcome;
   const winnings = state.r1Winnings;
   const contact = winnings > 0;
+  const playContact = useSfx("contact");
+
+  useEffect(() => {
+    if (contact) playContact();
+  }, [contact, playContact]);
 
   const onContinue = () => dispatch({ type: "PLAY_AGAIN" });
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { rollPitch } from "@/lib/probabilities";
 import { sumStaked } from "@/lib/bets";
 import { useBalance, useJackpot } from "@/lib/persistence";
+import { useSfx } from "@/lib/audio";
 import type { Bet, ChipValue, GameAction, GameState } from "@/lib/gameState";
 import StrikeZoneGrid from "./StrikeZoneGrid";
 import ChipRack from "./ChipRack";
@@ -22,6 +23,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
   const [balance, setBalance] = useBalance();
   const [, setJackpot] = useJackpot();
   const [tooltip, setTooltip] = useState<string | null>(null);
+  const playChipClick = useSfx("chipClick");
 
   const staked = sumStaked(state.bets);
   const canThrowPitch = staked > 0 && staked <= balance;
@@ -44,6 +46,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
       flash(`Not enough balance — $${(staked + stake).toLocaleString("en-US")} would exceed $${balance.toLocaleString("en-US")}`);
       return;
     }
+    playChipClick();
     if (next.kind === "zone") {
       dispatch({ type: "PLACE_BET", bet: { kind: "zone", cell: next.cell, amount: stake } });
     } else {
@@ -54,6 +57,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
   const selectChip = (chip: ChipValue) => {
     if (chip === state.activeChip) return;
     if (state.bets.length === 0) {
+      playChipClick();
       dispatch({ type: "SET_ACTIVE_CHIP", chip });
       return;
     }
@@ -65,6 +69,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
       flash(`Switch blocked — repricing ${state.bets.length} bets to $${chip} = $${repriced.toLocaleString("en-US")} exceeds balance $${balance.toLocaleString("en-US")}`);
       return;
     }
+    playChipClick();
     const original = state.bets;
     dispatch({ type: "CLEAR_BETS" });
     for (const bet of original) {
