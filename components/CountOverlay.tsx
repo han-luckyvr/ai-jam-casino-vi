@@ -5,7 +5,7 @@ export default function CountOverlay() {
     <div
       className="count-bug"
       role="status"
-      aria-label="Top of 7th, 0 balls, 0 strikes, 2 outs"
+      aria-label="Top of 7th, 3 balls, 2 strikes, 2 outs"
     >
       <div className="count-header">
         <div className="count-mark">
@@ -21,16 +21,16 @@ export default function CountOverlay() {
         <div className="count-row">
           <span className="count-label">BALL</span>
           <div className="count-squares" aria-hidden="true">
-            <span className="count-sq" />
-            <span className="count-sq" />
-            <span className="count-sq" />
+            <span className="count-sq on" />
+            <span className="count-sq on" />
+            <span className="count-sq on" />
           </div>
         </div>
         <div className="count-row">
           <span className="count-label">STRIKE</span>
           <div className="count-squares" aria-hidden="true">
-            <span className="count-sq" />
-            <span className="count-sq" />
+            <span className="count-sq on" />
+            <span className="count-sq on" />
           </div>
         </div>
         <div className="count-row">
