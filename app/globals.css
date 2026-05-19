@@ -1,0 +1,65 @@
+:root {
+  --bg: #000000;
+  --panel: #0a081b;
+  --panel-2: #15112e;
+  --cream: #fff4db;
+  --magenta: #fb009f;
+  --red: #f8050e;
+  --orange: #fc6b23;
+  --coral: #ff6944;
+  --yellow: #ffe054;
+  --purple: #9500c6;
+  --blue: #173dff;
+  --cyan: #2aeaff;
+  --rule: rgba(255, 244, 219, 0.12);
+  --rule-strong: rgba(42, 234, 255, 0.45);
+  --muted: rgba(255, 244, 219, 0.62);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--cream);
+}
+
+body {
+  font-family: var(--font-montserrat), system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 300;
+  line-height: 1.55;
+  font-size: 15px;
+  letter-spacing: 0.005em;
+  background:
+    radial-gradient(900px 600px at 85% -10%, rgba(149, 0, 198, 0.22), transparent 60%),
+    radial-gradient(800px 500px at 0% 110%, rgba(251, 0, 159, 0.18), transparent 65%),
+    radial-gradient(700px 500px at 50% 50%, rgba(42, 234, 255, 0.06), transparent 70%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+@keyframes splash-blink {
+  0%   { opacity: 1; }
+  100% { opacity: 0.25; }
+}
+
+.splash-blink {
+  animation: splash-blink 1s steps(2, jump-none) infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-blink {
+    animation: none;
+    opacity: 0.85;
+  }
+}

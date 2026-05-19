@@ -1,0 +1,1156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STRIKE ZONE: Ducks at Bat — Product Doc</title>
+<style>
+  :root {
+    --bg: #000000;
+    --panel: #0a081b;
+    --panel-2: #15112e;
+    --cream: #fff4db;
+    --magenta: #fb009f;
+    --red: #f8050e;
+    --orange: #fc6b23;
+    --coral: #ff6944;
+    --yellow: #ffe054;
+    --purple: #9500c6;
+    --blue: #173dff;
+    --cyan: #2aeaff;
+    --rule: rgba(255,244,219,.12);
+    --rule-strong: rgba(42,234,255,.45);
+    --muted: rgba(255,244,219,.62);
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--cream); }
+  body {
+    margin: 0;
+    font-family: 'Capitana', 'Montserrat', system-ui, -apple-system, Segoe UI, sans-serif;
+    font-weight: 300;
+    line-height: 1.55;
+    font-size: 15px;
+    letter-spacing: .005em;
+    background:
+      radial-gradient(900px 600px at 85% -10%, rgba(149,0,198,.22), transparent 60%),
+      radial-gradient(800px 500px at 0% 110%, rgba(251,0,159,.18), transparent 65%),
+      radial-gradient(700px 500px at 50% 50%, rgba(42,234,255,.06), transparent 70%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 56px 28px 120px; }
+  h1, h2, h3, h4 {
+    font-family: 'Capitana', 'Montserrat', system-ui, sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin: 0 0 .4em;
+    color: #fff;
+  }
+  h1 { font-size: 56px; line-height: 1.02; }
+  h2 { font-size: 28px; color: var(--cyan); margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--rule); }
+  h3 { font-size: 18px; color: var(--cream); margin-top: 28px; }
+  h4 { font-size: 13px; color: var(--magenta); letter-spacing: .08em; margin-top: 20px; }
+  p { margin: .6em 0; color: var(--cream); }
+  .muted { color: var(--muted); }
+  a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed rgba(42,234,255,.45); }
+  a:hover { color: #fff; }
+
+  /* Cover */
+  .cover {
+    position: relative;
+    padding: 80px 40px 80px;
+    margin-bottom: 24px;
+    border: 1px solid var(--rule);
+    border-radius: 18px;
+    background:
+      radial-gradient(600px 280px at 10% 0%, rgba(42,234,255,.18), transparent 60%),
+      radial-gradient(500px 320px at 100% 100%, rgba(251,0,159,.22), transparent 60%),
+      linear-gradient(180deg, #06051a 0%, #0a081b 100%);
+    overflow: hidden;
+  }
+  .cover .eyebrow {
+    color: var(--cyan); font-weight: 700; text-transform: uppercase;
+    letter-spacing: .18em; font-size: 12px; margin-bottom: 14px;
+  }
+  .cover h1 {
+    background: linear-gradient(90deg, #ffe054, #fc6b23 32%, #fb009f 65%, #9500c6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cover .sub { font-size: 18px; color: var(--cream); max-width: 720px; margin-top: 12px; }
+  .cover .tags { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    border: 1px solid var(--rule-strong);
+    color: var(--cyan);
+    padding: 6px 12px; border-radius: 999px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .12em; font-weight: 700;
+  }
+
+  /* TOC */
+  .toc {
+    display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px 24px;
+    margin: 28px 0 0; padding: 20px 24px; border: 1px solid var(--rule); border-radius: 12px;
+    background: rgba(10,8,27,.6);
+  }
+  .toc a { display: block; padding: 4px 0; border: none; color: var(--cream); }
+  .toc a:hover { color: var(--cyan); }
+  .toc .num { color: var(--magenta); display: inline-block; width: 28px; font-weight: 700; }
+
+  /* Generic panels */
+  .panel {
+    background: rgba(10,8,27,.65);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin: 16px 0;
+  }
+  .panel.neon { border-color: rgba(42,234,255,.4); box-shadow: 0 0 0 1px rgba(42,234,255,.08), 0 0 28px rgba(42,234,255,.07) inset; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
+  @media (max-width: 760px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* Tables */
+  table {
+    width: 100%; border-collapse: collapse; margin: 14px 0 8px;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left; vertical-align: top; padding: 10px 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+  th {
+    color: var(--cyan); text-transform: uppercase; letter-spacing: .08em;
+    font-size: 11px; font-weight: 700; border-bottom-color: var(--rule-strong);
+    background: rgba(42,234,255,.04);
+  }
+  td code { background: rgba(42,234,255,.08); padding: 2px 6px; border-radius: 4px; color: var(--cyan); font-size: 12.5px; }
+  tr:hover td { background: rgba(255,244,219,.02); }
+
+  /* Code / prompt blocks */
+  pre, code {
+    font-family: ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+    font-size: 12.5px;
+  }
+  pre {
+    background: #060512; border: 1px solid var(--rule);
+    padding: 14px 16px; border-radius: 10px; overflow-x: auto;
+    color: #e3dccb; line-height: 1.5; white-space: pre-wrap;
+  }
+  .prompt {
+    background: linear-gradient(180deg, rgba(251,0,159,.06), rgba(42,234,255,.03));
+    border-left: 3px solid var(--magenta);
+  }
+  .prompt-veo { border-left-color: var(--cyan); background: linear-gradient(180deg, rgba(42,234,255,.07), rgba(23,61,255,.03)); }
+  .prompt-fal { border-left-color: var(--yellow); background: linear-gradient(180deg, rgba(255,224,84,.07), rgba(252,107,35,.03)); }
+  .prompt-label {
+    display: inline-block;
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    font-weight: 700; color: var(--cream); opacity: .8; margin-bottom: 6px;
+  }
+
+  /* Color swatches */
+  .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 12px; }
+  @media (max-width: 760px) { .swatches { grid-template-columns: repeat(2, 1fr); } }
+  .sw { border: 1px solid var(--rule); border-radius: 10px; padding: 12px; background: #060512; }
+  .sw .chip { height: 64px; border-radius: 6px; margin-bottom: 8px; }
+  .sw .name { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--cream); }
+  .sw .hex { font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--muted); }
+
+  /* Wireframe SVGs */
+  .wire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+  @media (max-width: 920px) { .wire-grid { grid-template-columns: 1fr; } }
+  .wire {
+    background: #0e0c1f;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .wire h4 { margin: 0 0 8px; color: var(--cyan); font-size: 12px; letter-spacing: .12em; }
+  .wire .cap { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .wire svg { display: block; width: 100%; height: auto; background: #161329; border-radius: 8px; }
+
+  /* Inline state machine */
+  .flow svg { display: block; width: 100%; height: auto; background: #0a081b; border-radius: 12px; border: 1px solid var(--rule); }
+
+  /* RTP boxes */
+  .math {
+    background: #060512; border: 1px dashed rgba(42,234,255,.35);
+    padding: 12px 14px; border-radius: 8px; font-family: ui-monospace, Consolas, monospace;
+    font-size: 13px; color: var(--cyan); margin: 8px 0;
+  }
+  .kbd {
+    display: inline-block; border: 1px solid var(--rule); border-radius: 5px;
+    padding: 1px 6px; font-family: ui-monospace, Consolas, monospace; font-size: 12px;
+    color: var(--cream); background: rgba(255,255,255,.04);
+  }
+  .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .08em; font-weight: 700;
+  }
+  .pill.cyan { background: rgba(42,234,255,.12); color: var(--cyan); }
+  .pill.magenta { background: rgba(251,0,159,.12); color: var(--magenta); }
+  .pill.yellow { background: rgba(255,224,84,.12); color: var(--yellow); }
+  .pill.purple { background: rgba(149,0,198,.16); color: #d59bff; }
+
+  ul { color: var(--cream); }
+  li { margin: .25em 0; }
+
+  hr.sep { border: 0; height: 1px; background: var(--rule); margin: 36px 0 12px; }
+
+  .lede {
+    font-size: 17px; line-height: 1.6; color: var(--cream);
+    max-width: 820px;
+  }
+
+  /* Asset table layout */
+  .asset-table th:nth-child(1), .asset-table td:nth-child(1) { width: 16%; white-space: nowrap; font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--magenta); }
+  .asset-table th:nth-child(2), .asset-table td:nth-child(2) { width: 22%; }
+  .asset-table th:nth-child(3), .asset-table td:nth-child(3) { width: 14%; font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--cyan); }
+  .asset-table th:nth-child(4), .asset-table td:nth-child(4) { width: 12%; }
+  .asset-table td pre { margin: 6px 0 0; font-size: 12px; }
+  .asset-table td:nth-child(5) pre { background: #050410; border-left: 3px solid var(--magenta); }
+
+  .small { font-size: 12px; color: var(--muted); }
+
+  .grid-soft { background: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px), repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 28px); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============================================================ -->
+  <!-- COVER -->
+  <!-- ============================================================ -->
+  <section class="cover">
+    <div class="eyebrow">Vegas Infinite · AI Challenge: VI Originals · Product Brief v1</div>
+    <h1>Strike Zone:<br>Ducks at Bat</h1>
+    <p class="sub">A two-round casino original where the player steps into the box at a 3-2 count. Bet the strike zone, swing for the fences. Blubos pitch. Squeaky Sluggers swing.</p>
+    <div class="tags">
+      <span class="tag">95% RTP</span>
+      <span class="tag">2-round flow</span>
+      <span class="tag">Progressive Jackpot</span>
+      <span class="tag">VI Branded</span>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <nav class="toc" aria-label="Contents">
+    <a href="#tldr"><span class="num">01</span> TL;DR &amp; pitch</a>
+    <a href="#concept"><span class="num">02</span> Concept &amp; story</a>
+    <a href="#flow"><span class="num">03</span> Game flow</a>
+    <a href="#round1"><span class="num">04</span> Round 1 — Strike Zone</a>
+    <a href="#round2"><span class="num">05</span> Round 2 — Swing power</a>
+    <a href="#wires"><span class="num">06</span> Wireframes</a>
+    <a href="#brand"><span class="num">07</span> Brand tokens</a>
+    <a href="#assets-img"><span class="num">08</span> Assets — Images</a>
+    <a href="#assets-vid"><span class="num">09</span> Assets — Videos</a>
+    <a href="#assets-aud"><span class="num">10</span> Assets — Audio</a>
+    <a href="#delivery"><span class="num">11</span> Delivery</a>
+    <a href="#verify"><span class="num">12</span> Brief alignment</a>
+  </nav>
+
+  <!-- ============================================================ -->
+  <h2 id="tldr">01 · TL;DR</h2>
+  <!-- ============================================================ -->
+  <p class="lede">
+    <strong>Strike Zone: Ducks at Bat</strong> is a fast, two-round casino original for Vegas Infinite.
+    The player is a Squeaky Slugger (VI Ducky in baseball gear) facing a Blubo pitcher at a full count.
+    In <strong>Round 1</strong> they place bets on a 3×3 strike-zone grid and watch a first-person pitch
+    cinematic resolve to a hit (in-zone) or strikeout (out-of-zone, the house edge). On contact, <strong>Round 2</strong>
+    asks them to pick a swing — Contact, Power, or Grand Slam — each with its own risk curve, the last
+    feeding the always-visible <strong>Progressive Jackpot</strong>, fed by 1% of every wager and won outright on a Grand-Slam HR.
+  </p>
+  <p class="muted">Single session is ~30 seconds, ~$0.30–$30 per game. Designed for portrait and landscape web, deployed on Vercel.</p>
+
+  <div class="panel grid-3" style="margin-top:18px;">
+    <div>
+      <div class="pill cyan">Round 1</div>
+      <h3 style="margin-top:8px">Bet the zone</h3>
+      <p class="small">9-cell strike zone. Single bets pay 9×, line bets pay 3×. 4% of pitches miss the zone for a strikeout — the house edge.</p>
+    </div>
+    <div>
+      <div class="pill magenta">Round 2</div>
+      <h3 style="margin-top:8px">Pick a swing</h3>
+      <p class="small">Three risk curves: Contact (1.25× safe), Power (2.0× mid), or Grand Slam (wins the progressive pool, rare). Opt 1 &amp; 2 are tuned to 95% RTP. Opt 3 has lower deterministic RTP (~46%) but is the only path to win the progressive pool — a separate side bonus, not counted in the headline RTP.</p>
+    </div>
+    <div>
+      <div class="pill yellow">Jackpot</div>
+      <h3 style="margin-top:8px">Progressive pool</h3>
+      <p class="small">Always shown at top-centre. Grows by 1% of every wager. Won outright on Option 3 (Grand Slam) at 0.5% per attempt.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="concept">02 · Concept &amp; Story</h2>
+  <!-- ============================================================ -->
+
+  <h3>The matchup</h3>
+  <p>
+    <strong>Team Lucky Logic</strong> (defence) is the <strong>Blubos</strong> — translucent blue cube creatures
+    with pixel-grin faces, wearing black jerseys and caps stamped with the Lucky Logic green-cube logo. They pitch,
+    catch, and field.
+  </p>
+  <p>
+    <strong>Team VI</strong> (offence) is led by the <strong>Vegas Infinite Ducky</strong> in a black puffer vest
+    and batting helmet stamped with the VI spade-and-infinity logo, plus pinstripe pants. Yellow rubber, gold beak,
+    all swagger. Every game session, the Ducky steps into the batter's box for Team VI.
+  </p>
+  <p class="muted small">
+    Brand-bible note: the VI Brief excludes Meta Avatars. Blubo characters must be re-designed as VI-original
+    blue cube/robot characters (we keep the silhouette / vest motif, redraw the face and body so they are not Meta IP).
+  </p>
+
+  <h3>The count</h3>
+  <p>
+    Every game opens at <strong>2 strikes, 3 balls</strong> — a full count. One pitch decides everything.
+    This framing gives the player constant high-stakes tension and naturally explains the one-pitch-per-game
+    structure: it's not artificial pacing, it's baseball.
+  </p>
+
+  <h3>Why it fits VI</h3>
+  <ul>
+    <li><strong>Original.</strong> Strike-zone betting on a 3×3 grid married to a baseball-themed two-round risk ladder doesn't exist on a casino floor.</li>
+    <li><strong>Branded.</strong> Uses the VI Ducky mascot natively. Renders in VI's neon-on-flood-black palette with Capitana type and hex holding devices.</li>
+    <li><strong>Web-ready.</strong> Short sessions, low spec, video overlays drive emotion. No physics. Tappable on phone, beautiful on desktop.</li>
+    <li><strong>Inclusive.</strong> Baseball is universal; the grid is legible; the maths is transparent. Single click to play.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="flow">03 · Game Flow</h2>
+  <!-- ============================================================ -->
+  <p class="muted">High-level player journey. Each node is a screen the player sees.</p>
+  <div class="flow panel" style="padding:14px;">
+    <svg viewBox="0 0 900 380" role="img" aria-label="Game flow state diagram">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2aeaff"/>
+        </marker>
+        <marker id="arrow-mag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#fb009f"/>
+        </marker>
+      </defs>
+      <style>
+        .node { fill: #15112e; stroke: #2aeaff; stroke-width: 1.5; }
+        .node-danger { fill: #15112e; stroke: #fb009f; stroke-width: 1.5; }
+        .node-good { fill: #15112e; stroke: #ffe054; stroke-width: 1.5; }
+        .label { fill: #fff4db; font: 700 11px 'Capitana','Montserrat',sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+        .sub { fill: #2aeaff; font: 400 10px 'Capitana','Montserrat',sans-serif; }
+        .arr { stroke: #2aeaff; stroke-width: 1.6; fill: none; }
+        .arr-mag { stroke: #fb009f; stroke-width: 1.6; fill: none; }
+        .gloss { fill: rgba(255,244,219,.6); font: 400 10px 'Capitana','Montserrat',sans-serif; }
+      </style>
+
+      <!-- Top row -->
+      <rect class="node" x="20" y="30" width="120" height="48" rx="8"/>
+      <text class="label" x="80" y="58" text-anchor="middle">Splash</text>
+
+      <rect class="node" x="170" y="30" width="160" height="48" rx="8"/>
+      <text class="label" x="250" y="58" text-anchor="middle">R1 · Bet placement</text>
+
+      <rect class="node" x="360" y="30" width="160" height="48" rx="8"/>
+      <text class="label" x="440" y="58" text-anchor="middle">R1 · Pitch video</text>
+
+      <rect class="node" x="550" y="30" width="160" height="48" rx="8"/>
+      <text class="label" x="630" y="58" text-anchor="middle">R1 · Resolve</text>
+
+      <line class="arr" x1="140" y1="54" x2="170" y2="54" marker-end="url(#arrow)"/>
+      <line class="arr" x1="330" y1="54" x2="360" y2="54" marker-end="url(#arrow)"/>
+      <line class="arr" x1="520" y1="54" x2="550" y2="54" marker-end="url(#arrow)"/>
+
+      <!-- Branch -->
+      <line class="arr-mag" x1="630" y1="78" x2="630" y2="130" marker-end="url(#arrow-mag)"/>
+      <text class="gloss" x="640" y="105">out of zone · 5%</text>
+
+      <rect class="node-danger" x="550" y="130" width="160" height="44" rx="8"/>
+      <text class="label" x="630" y="156" text-anchor="middle" fill="#fb009f">Strikeout — game over</text>
+
+      <line class="arr-mag" x1="550" y1="152" x2="470" y2="152"/>
+      <line class="arr-mag" x1="470" y1="152" x2="470" y2="30" marker-end="url(#arrow-mag)"/>
+      <text class="gloss" x="370" y="148">replay</text>
+
+      <line class="arr" x1="630" y1="78" x2="630" y2="200" />
+      <line class="arr" x1="630" y1="200" x2="510" y2="200" marker-end="url(#arrow)"/>
+      <text class="gloss" x="540" y="194">in zone · 95% · pay R1 winners</text>
+
+      <!-- Round 2 row (MVP: no swing video — resolves directly from choose-swing) -->
+      <rect class="node" x="340" y="180" width="160" height="48" rx="8"/>
+      <text class="label" x="420" y="208" text-anchor="middle">R2 · Choose swing</text>
+
+      <rect class="node-good" x="20" y="180" width="120" height="48" rx="8"/>
+      <text class="label" x="80" y="200" text-anchor="middle" fill="#ffe054">R2 · Resolve</text>
+      <text class="sub" x="80" y="216" text-anchor="middle">payout</text>
+
+      <line class="arr" x1="340" y1="204" x2="140" y2="204" marker-end="url(#arrow)"/>
+      <text class="gloss" x="240" y="198" text-anchor="middle">resolve (no video · MVP)</text>
+
+      <!-- Loop back -->
+      <line class="arr" x1="20" y1="204" x2="0" y2="204"/>
+      <line class="arr" x1="0" y1="204" x2="0" y2="320"/>
+      <line class="arr" x1="0" y1="320" x2="450" y2="320"/>
+      <line class="arr" x1="450" y1="320" x2="450" y2="280"/>
+
+      <rect class="node" x="380" y="270" width="140" height="48" rx="8"/>
+      <text class="label" x="450" y="298" text-anchor="middle">Play again</text>
+      <line class="arr" x1="380" y1="294" x2="80" y2="294"/>
+      <line class="arr" x1="80" y1="294" x2="80" y2="78" marker-end="url(#arrow)"/>
+
+      <text class="gloss" x="540" y="296">balance + jackpot pool carry over</text>
+    </svg>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="round1">04 · Round 1 — Strike Zone</h2>
+  <!-- ============================================================ -->
+  <p>
+    The 3×3 strike zone is rendered as a neon-edged grid floating over the behind-the-plate gameplay scene.
+    The player first picks an <strong>active chip</strong> from the 4-chip rack ($1 / $5 / $25 / $100),
+    then taps cells to place <strong>zone bets</strong> or row/column/diagonal markers to place
+    <strong>line bets</strong>. Multiple simultaneous bets are allowed; switching the active chip reprices
+    every existing bet in real time.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Bet type</th><th>Coverage</th><th>Stake</th><th>Pays</th><th>Win condition</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill cyan">Zone (single cell)</span></td>
+        <td>1 of 9 cells</td>
+        <td><strong>1×</strong> active chip</td>
+        <td><strong>9×</strong> stake</td>
+        <td>Ball lands in that exact cell</td>
+      </tr>
+      <tr>
+        <td><span class="pill magenta">Line</span></td>
+        <td>3 cells in a row, column, or diagonal (8 lines total)</td>
+        <td><strong>3×</strong> active chip (one chip per covered cell)</td>
+        <td><strong>3×</strong> stake</td>
+        <td>Ball lands in any of the 3 cells</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Pitch outcome distribution</h3>
+  <p>
+    The pitch result is computed at the moment the player taps <span class="kbd">Throw pitch</span>.
+    The video plays, then the resolve frame highlights the result cell (or an out-of-zone position).
+  </p>
+  <table>
+    <thead><tr><th>Outcome</th><th>Probability</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Outside zone</strong></td><td><code>5.0%</code></td><td>Strikeout. All R1 bets lost. Game over.</td></tr>
+      <tr><td>In zone (any cell)</td><td><code>95.0%</code></td><td>Contact. Pay matching R1 bets. Advance to R2.</td></tr>
+      <tr><td><em>· per individual cell</em></td><td><code>10.556%</code></td><td>Uniform across the 9 cells (95% / 9).</td></tr>
+    </tbody>
+  </table>
+
+  <h3>RTP math</h3>
+  <div class="math">
+    Zone bet EV    =  (0.95 / 9) × 9  +  (1 − 0.95 / 9) × 0  =  <b>0.95</b>
+  </div>
+  <div class="math">
+    Line bet EV    =  (0.95 × 3 / 9) × 3  =  <b>0.95</b>
+  </div>
+  <p class="small muted">Both bet types share an identical <strong>95% RTP</strong> — this is the headline player return. The 5% house edge is split: <strong>4% true house take</strong> + <strong>1% diverted to the progressive jackpot pool</strong>. The pool is a separate side mechanic: it grows on every wager and pays out on a Grand-Slam HR (see §05), but pool wins are a <em>bonus</em> on top of the published RTP — not a guaranteed return — so we do not count them toward the headline figure.</p>
+
+  <h3>Chip-based bet sizing</h3>
+  <p>
+    The active chip is the multiplier for every bet on the table. A zone bet stakes <code>1 × chip</code>;
+    a line bet stakes <code>3 × chip</code> (one chip per covered cell). Switching the active chip
+    re-prices every existing bet in real time.
+  </p>
+  <table>
+    <thead><tr><th>Active chip</th><th>1 zone bet</th><th>1 line bet</th><th>1 zone + 1 line (total staked)</th></tr></thead>
+    <tbody>
+      <tr><td>$1</td><td>$1</td><td>$3</td><td>$4</td></tr>
+      <tr><td>$5</td><td>$5</td><td>$15</td><td>$20</td></tr>
+      <tr><td>$25</td><td>$25</td><td>$75</td><td>$100</td></tr>
+      <tr><td>$100</td><td>$100</td><td>$300</td><td>$400</td></tr>
+    </tbody>
+  </table>
+  <p class="small muted">
+    Worked example: with the $5 chip selected, 1 zone + 1 line = $5 + $15 = $20 staked.
+    Switching the active chip to $100 immediately reprices the same bets to $100 + $300 = $400
+    (a 20× scale-up). The balance check fires on every chip switch as well as on every placement:
+    if the reprice would exceed the player's balance, the switch is blocked and a tooltip
+    prompts the player to remove bets first.
+  </p>
+
+  <h3>Edge cases</h3>
+  <ul>
+    <li><strong>Multiple bets, same cell hit:</strong> if a zone + line both cover the winning cell, both pay independently.</li>
+    <li><strong>Max bet:</strong> per-cell stake cap (configurable, default = 5× table minimum to keep jackpot exposure bounded).</li>
+    <li><strong>Insufficient balance — placement:</strong> a zone/line tap is rejected (with a tooltip) if it would push total staked above balance.</li>
+    <li><strong>Insufficient balance — chip up-switch:</strong> tapping a higher-denomination chip is blocked if the resulting reprice would exceed the player's balance; the player must remove bets first.</li>
+    <li><strong>No bets placed:</strong> "Throw pitch" disabled; tooltip prompts a minimum stake.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="round2">05 · Round 2 — Swing Power</h2>
+  <!-- ============================================================ -->
+  <p>
+    Round 2 only runs if Round 1 made contact. The player picks one of three swing options on three
+    neon hex cards. The R2 stake equals the <strong>sum of all R1 bet stakes</strong> the player committed
+    on this hand. Options 1 and 2 each independently target <strong>95% RTP</strong>. Option 3 is the
+    <strong>lottery option</strong>: its deterministic (non-HR) RTP is intentionally low (~46%), and the
+    upside lives entirely in the rare HR roll, which pays the live progressive pool. Pool wins are a
+    side bonus — not counted toward the published 95% headline RTP.
+  </p>
+
+  <h3>Option 1 — Contact swing <span class="pill cyan">Low risk</span></h3>
+  <p>"Just put it in play." Usually a single, occasionally an out.</p>
+  <table>
+    <thead><tr><th>Outcome</th><th>Probability</th><th>Return</th><th>Contribution</th></tr></thead>
+    <tbody>
+      <tr><td>Single</td><td><code>76.0%</code></td><td>1.25× stake</td><td>0.950</td></tr>
+      <tr><td>Out (caught / grounded)</td><td><code>24.0%</code></td><td>0×</td><td>0.000</td></tr>
+    </tbody>
+  </table>
+  <div class="math">RTP = 0.76 × 1.25 + 0.24 × 0 = <b>0.95</b></div>
+
+  <h3>Option 2 — Power swing <span class="pill magenta">Mid risk</span></h3>
+  <p>"Go for extra bases." Doubles are the main prize; singles are a push refund.</p>
+  <table>
+    <thead><tr><th>Outcome</th><th>Probability</th><th>Return</th><th>Contribution</th></tr></thead>
+    <tbody>
+      <tr><td>Double</td><td><code>40.0%</code></td><td>2.0×</td><td>0.800</td></tr>
+      <tr><td>Single (push refund)</td><td><code>15.0%</code></td><td>1.0×</td><td>0.150</td></tr>
+      <tr><td>Out</td><td><code>45.0%</code></td><td>0×</td><td>0.000</td></tr>
+    </tbody>
+  </table>
+  <div class="math">RTP = 0.40 × 2.0 + 0.15 × 1.0 + 0.45 × 0 = <b>0.95</b></div>
+
+  <h3>Option 3 — Grand-slam swing <span class="pill purple">High risk · Jackpot</span></h3>
+  <p>"Swing for the fences." Mostly an out. Sometimes a triple. Occasionally a double. Once in 200, the
+  player wins the entire <strong>progressive jackpot pool</strong> outright.</p>
+  <table>
+    <thead><tr><th>Outcome</th><th>Probability</th><th>Return</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>🏆 Home Run (Jackpot)</td><td><code>0.5%</code></td><td><strong>Progressive pool</strong></td><td>Player wins the full live pool; pool resets to its $1,000 seed.</td></tr>
+      <tr><td>Triple</td><td><code>10.0%</code></td><td>3× stake</td><td>Contribution to immediate RTP: 0.300</td></tr>
+      <tr><td>Double</td><td><code>8.0%</code></td><td>2× stake</td><td>Contribution to immediate RTP: 0.160</td></tr>
+      <tr><td>Out (fly-out / grounder)</td><td><code>81.5%</code></td><td>0×</td><td>Contribution: 0.000</td></tr>
+    </tbody>
+  </table>
+  <div class="math">Deterministic (non-HR) RTP = 0.10 × 3 + 0.08 × 2 + 0.815 × 0 = <b>0.46</b></div>
+  <p class="small muted">Opt 3 is the <strong>lottery option</strong> — most swings return nothing, and the 46% deterministic RTP is well below the 95% headline. The HR roll (0.5%) pays the entire live progressive pool, which is funded by 1% of every R1 wager. A pool win is treated as a <em>side bonus</em>, not part of the published RTP: lucky players hit huge windfalls, the long-run expected pool win value is reflected in the 1% pool-diversion line item, but no single Opt 3 attempt is "guaranteed" the pool.</p>
+
+  <h3>Jackpot display</h3>
+  <p>
+    The Jackpot label is always visible at <strong>top centre</strong>. It shows the
+    <strong>live progressive pool value</strong> in cream tabular numerals (e.g. <code>JACKPOT $1,247</code>).
+    The pool grows by <strong>1% of every committed R1 wager</strong>; the label ticks up with a brief
+    cyan glow each time a pitch is committed. When the player is in Round 2 with Option 3 selected,
+    the label pulses cyan/magenta to telegraph "this swing can win the whole pool".
+  </p>
+  <p>
+    The pool seeds at <strong>$1,000</strong> on first install and <strong>persists across browser
+    sessions</strong>. On a Grand-Slam HR, the player is credited the full pool value and the pool
+    resets to the $1,000 seed.
+  </p>
+
+  <h3>Compound payout examples</h3>
+  <p class="small muted">Assumes a $5 active chip throughout. The "Opt 3 HR" example assumes the live pool sits at <code>$1,247</code> at the moment of the swing — actual pool value varies session to session.</p>
+  <table>
+    <thead><tr><th>Scenario</th><th>R1 win</th><th>R2 result</th><th>Total return</th></tr></thead>
+    <tbody>
+      <tr><td>$5 zone on winning cell → Opt 3 HR</td><td>$45</td><td>$1,247 (full pool)</td><td><strong>$1,292</strong></td></tr>
+      <tr><td>$5 line ($15 staked) on winning line → Opt 2 Double</td><td>$45</td><td>$30</td><td><strong>$75</strong></td></tr>
+      <tr><td>$5 zone, ball in zone but different cell → Opt 1 Single</td><td>$0</td><td>$6</td><td><strong>$6</strong></td></tr>
+      <tr><td>$5 zone → Opt 1 Out</td><td>$0 or $45 depending on cell hit</td><td>$0</td><td><strong>$0 or $45</strong></td></tr>
+      <tr><td>Strikeout (out-of-zone)</td><td>$0</td><td>n/a (no R2)</td><td><strong>$0</strong></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="wires">06 · Wireframes</h2>
+  <!-- ============================================================ -->
+  <p class="muted">Lo-fi mockups. Boxes = layout placeholders. Annotations call out behaviour and copy.</p>
+
+  <div class="wire-grid">
+
+    <!-- W1 SPLASH -->
+    <div class="wire">
+      <h4>W1 · Splash / Title</h4>
+      <svg viewBox="0 0 400 280" aria-label="Splash screen wireframe">
+        <rect width="400" height="280" fill="#161329"/>
+        <rect x="0" y="0" width="400" height="32" fill="#1d1a36"/>
+        <text x="200" y="20" fill="#9b97aa" font-family="monospace" font-size="11" text-anchor="middle">JACKPOT $1,247</text>
+        <rect x="100" y="80" width="200" height="60" fill="#2a2746" stroke="#5b5478" rx="6"/>
+        <text x="200" y="116" fill="#cbc7d8" font-family="monospace" font-size="12" text-anchor="middle">[ GAME LOGO ]</text>
+        <rect x="130" y="170" width="140" height="38" fill="#3a345b" stroke="#7a73a4" rx="20"/>
+        <text x="200" y="194" fill="#fff4db" font-family="monospace" font-size="11" text-anchor="middle">TAP TO PLAY ▸</text>
+        <rect x="16" y="248" width="100" height="22" fill="#2a2746" stroke="#5b5478" rx="4"/>
+        <text x="66" y="263" fill="#cbc7d8" font-family="monospace" font-size="10" text-anchor="middle">Balance $1,000</text>
+        <rect x="280" y="248" width="100" height="22" fill="#2a2746" stroke="#5b5478" rx="4"/>
+        <text x="330" y="263" fill="#cbc7d8" font-family="monospace" font-size="10" text-anchor="middle">⚙ Settings</text>
+      </svg>
+      <p class="cap">Logo, "TAP TO PLAY", balance bottom-left, settings bottom-right. Jackpot ticker on top bar shows the live <strong>progressive jackpot pool</strong> (persists across sessions; ticks up after each pitch commits).</p>
+    </div>
+
+    <!-- W2 R1 BET -->
+    <div class="wire">
+      <h4>W2 · R1 Bet placement (behind the plate)</h4>
+      <svg viewBox="0 0 400 280" aria-label="R1 bet placement wireframe">
+        <rect width="400" height="280" fill="#161329"/>
+        <!-- Top bar: progressive jackpot + balance/staked readout -->
+        <rect x="0" y="0" width="400" height="28" fill="#1d1a36"/>
+        <text x="100" y="18" fill="#2aeaff" font-family="monospace" font-size="10" text-anchor="middle">JACKPOT $1,247</text>
+        <text x="300" y="18" fill="#fff4db" font-family="monospace" font-size="10" text-anchor="middle">BAL $965 · STAKED $100</text>
+        <!-- Stadium BG -->
+        <rect x="0" y="28" width="400" height="158" fill="#1a1734"/>
+        <text x="200" y="44" fill="#7a73a4" font-family="monospace" font-size="9" text-anchor="middle">[ IMG-03 — before-the-pitch establishing scene (pitcher Blubo + Ducky baked in) ]</text>
+        <!-- Strike zone grid -->
+        <g stroke="#2aeaff" fill="none" stroke-width="1.5">
+          <rect x="140" y="64" width="120" height="100"/>
+          <line x1="180" y1="64" x2="180" y2="164"/>
+          <line x1="220" y1="64" x2="220" y2="164"/>
+          <line x1="140" y1="97" x2="260" y2="97"/>
+          <line x1="140" y1="130" x2="260" y2="130"/>
+        </g>
+        <!-- Line markers (row/col/diag tap dots around the grid edge) -->
+        <g fill="#2aeaff" fill-opacity="0.55">
+          <circle cx="128" cy="80" r="2.5"/>
+          <circle cx="128" cy="113" r="2.5"/>
+          <circle cx="128" cy="146" r="2.5"/>
+          <circle cx="160" cy="56" r="2.5"/>
+          <circle cx="200" cy="56" r="2.5"/>
+          <circle cx="240" cy="56" r="2.5"/>
+          <circle cx="272" cy="68" r="2.5"/>
+          <circle cx="272" cy="160" r="2.5"/>
+        </g>
+        <!-- Middle row highlight (covers the placed line bet) -->
+        <rect x="140" y="97" width="120" height="33" fill="#fb009f" fill-opacity="0.10"/>
+        <!-- Placed chips: 1 zone (cell) + 1 line (row marker) -->
+        <circle cx="160" cy="80" r="7" fill="#fb009f" stroke="#fff4db" stroke-width="1.2"/>
+        <text x="160" y="83" text-anchor="middle" fill="#fff4db" font-family="monospace" font-size="6">$25</text>
+        <circle cx="128" cy="113" r="7" fill="#fb009f" stroke="#fff4db" stroke-width="1.2"/>
+        <text x="128" y="116" text-anchor="middle" fill="#fff4db" font-family="monospace" font-size="6">$75</text>
+        <text x="200" y="180" fill="#fff4db" font-family="monospace" font-size="8" text-anchor="middle">1 ZONE @ $25  ·  1 LINE @ $75 (3×chip)  ·  TOTAL $100</text>
+        <!-- Chip rack -->
+        <rect x="8" y="190" width="384" height="46" fill="#0c0a1f" stroke="#3a345b" rx="6"/>
+        <text x="14" y="200" fill="#7a73a4" font-family="monospace" font-size="7">CHIP RACK · cyan ring = active</text>
+        <g font-family="monospace" font-size="9">
+          <!-- $1 chip -->
+          <circle cx="40" cy="218" r="12" fill="#fff4db" stroke="#3a345b"/>
+          <text x="40" y="222" text-anchor="middle" fill="#000">$1</text>
+          <!-- $5 chip -->
+          <circle cx="80" cy="218" r="12" fill="#2aeaff" stroke="#3a345b"/>
+          <text x="80" y="222" text-anchor="middle" fill="#000">$5</text>
+          <!-- $25 chip — ACTIVE (cyan ring) -->
+          <circle cx="130" cy="218" r="16" fill="none" stroke="#2aeaff" stroke-width="2"/>
+          <circle cx="130" cy="218" r="12" fill="#fb009f" stroke="#fff4db" stroke-width="1.5"/>
+          <text x="130" y="222" text-anchor="middle" fill="#fff4db">$25</text>
+          <!-- $100 chip -->
+          <circle cx="180" cy="218" r="12" fill="#ffe054" stroke="#3a345b"/>
+          <text x="180" y="222" text-anchor="middle" fill="#000">$100</text>
+          <text x="265" y="215" fill="#cbc7d8" font-size="8" text-anchor="middle">tap a chip to activate</text>
+          <text x="265" y="227" fill="#7a73a4" font-size="7" text-anchor="middle">switching reprices all bets</text>
+          <rect x="335" y="206" width="55" height="24" fill="#173dff" stroke="#2aeaff" rx="4"/>
+          <text x="362" y="221" text-anchor="middle" fill="#fff4db">CLEAR</text>
+        </g>
+        <!-- Pitch CTA -->
+        <rect x="80" y="247" width="240" height="24" fill="#fb009f" stroke="#fff4db" rx="12"/>
+        <text x="200" y="263" text-anchor="middle" fill="#fff4db" font-family="monospace" font-size="11">▸ THROW PITCH · $100 staked</text>
+      </svg>
+      <p class="cap">4-chip rack at the bottom ($1 / $5 / $25 / $100); the active chip has a cyan ring. Tap a cell for a <strong>zone</strong> bet (1× chip) or tap one of the dotted line markers around the grid edge for a <strong>line</strong> bet (3× chip, one per covered cell). Tapping a different chip reprices every existing bet — blocked if the reprice would exceed balance. Top bar shows the live progressive jackpot plus balance/total-staked readout. Throw Pitch CTA stays disabled when staked &gt; balance or staked = 0.</p>
+    </div>
+
+    <!-- W3 PITCH VIDEO -->
+    <div class="wire">
+      <h4>W3 · R1 Pitch video (16:9 overlay)</h4>
+      <svg viewBox="0 0 400 280" aria-label="Pitch video wireframe">
+        <rect width="400" height="280" fill="#161329"/>
+        <rect x="0" y="0" width="400" height="32" fill="#1d1a36"/>
+        <text x="200" y="20" fill="#9b97aa" font-family="monospace" font-size="11" text-anchor="middle">JACKPOT $1,247</text>
+        <!-- 16:9 frame: 400x225 maps from top 32 -->
+        <rect x="20" y="60" width="360" height="200" fill="#0a081b" stroke="#2aeaff" stroke-width="2" rx="6"/>
+        <text x="200" y="160" fill="#7a73a4" font-family="monospace" font-size="11" text-anchor="middle">[ PITCH VIDEO ]  16:9</text>
+        <text x="200" y="180" fill="#7a73a4" font-family="monospace" font-size="9" text-anchor="middle">first-person hitter view · 2.0–2.5s</text>
+        <text x="200" y="200" fill="#9b97aa" font-family="monospace" font-size="8" text-anchor="middle">HUD hidden · no skip</text>
+      </svg>
+      <p class="cap">Full-bleed 16:9 video region. Blubo pitcher winds up, releases, ball arrives at camera. HUD elements fade out at video start, fade back in on resolve.</p>
+    </div>
+
+    <!-- W4a R1 RESOLVE — CONTACT -->
+    <div class="wire">
+      <h4>W4a · R1 Resolve — Contact</h4>
+      <svg viewBox="0 0 400 280" aria-label="Round 1 resolve wireframe (contact variant)">
+        <rect width="400" height="280" fill="#161329"/>
+        <rect x="0" y="0" width="400" height="32" fill="#1d1a36"/>
+        <text x="200" y="20" fill="#9b97aa" font-family="monospace" font-size="11" text-anchor="middle">JACKPOT $1,247</text>
+        <rect x="0" y="32" width="400" height="158" fill="#1a1734"/>
+        <text x="200" y="50" fill="#7a73a4" font-family="monospace" font-size="9" text-anchor="middle">[ IMG-05 — swing-and-a-hit key frame (contact variant) ]</text>
+        <g stroke="#2aeaff" fill="none" stroke-width="1.5">
+          <rect x="140" y="70" width="120" height="100"/>
+          <line x1="180" y1="70" x2="180" y2="170"/>
+          <line x1="220" y1="70" x2="220" y2="170"/>
+          <line x1="140" y1="103" x2="260" y2="103"/>
+          <line x1="140" y1="136" x2="260" y2="136"/>
+        </g>
+        <!-- ball lit on cell -->
+        <circle cx="200" cy="120" r="10" fill="#fff4db" stroke="#fb009f" stroke-width="2"/>
+        <text x="200" y="180" fill="#ffe054" font-family="monospace" font-size="9" text-anchor="middle">winning cell glows</text>
+        <rect x="60" y="200" width="280" height="34" fill="#0c0a1f" stroke="#2aeaff" rx="6"/>
+        <text x="200" y="222" fill="#2aeaff" font-family="monospace" font-size="13" text-anchor="middle">CONTACT! +$90</text>
+        <rect x="130" y="244" width="140" height="28" fill="#fb009f" stroke="#fff4db" rx="14"/>
+        <text x="200" y="263" text-anchor="middle" fill="#fff4db" font-family="monospace" font-size="11">CONTINUE ▸</text>
+      </svg>
+      <p class="cap">Contact key frame. Shows IMG-05 (swing and a hit) — ball glows on the winning cell, toast shows R1 winnings, Continue → R2.</p>
+    </div>
+
+    <!-- W4b R1 RESOLVE — STRIKEOUT -->
+    <div class="wire">
+      <h4>W4b · R1 Resolve — Strikeout</h4>
+      <svg viewBox="0 0 400 280" aria-label="Round 1 resolve wireframe (strikeout variant)">
+        <rect width="400" height="280" fill="#161329"/>
+        <rect x="0" y="0" width="400" height="32" fill="#1d1a36"/>
+        <text x="200" y="20" fill="#9b97aa" font-family="monospace" font-size="11" text-anchor="middle">JACKPOT $1,247</text>
+        <rect x="0" y="32" width="400" height="158" fill="#1a1734"/>
+        <text x="200" y="50" fill="#7a73a4" font-family="monospace" font-size="9" text-anchor="middle">[ IMG-04 — swing-and-a-miss key frame (strikeout variant) ]</text>
+        <g stroke="#2aeaff" fill="none" stroke-width="1.5">
+          <rect x="140" y="70" width="120" height="100"/>
+          <line x1="180" y1="70" x2="180" y2="170"/>
+          <line x1="220" y1="70" x2="220" y2="170"/>
+          <line x1="140" y1="103" x2="260" y2="103"/>
+          <line x1="140" y1="136" x2="260" y2="136"/>
+        </g>
+        <!-- ball lit outside grid -->
+        <circle cx="290" cy="90" r="10" fill="#fff4db" stroke="#fb009f" stroke-width="2"/>
+        <text x="290" y="115" fill="#fb009f" font-family="monospace" font-size="9" text-anchor="middle">ball missed</text>
+        <rect x="60" y="200" width="280" height="34" fill="#0c0a1f" stroke="#fb009f" rx="6"/>
+        <text x="200" y="222" fill="#fb009f" font-family="monospace" font-size="13" text-anchor="middle">STRIKEOUT — no R1 winnings</text>
+        <rect x="130" y="244" width="140" height="28" fill="#fb009f" stroke="#fff4db" rx="14"/>
+        <text x="200" y="263" text-anchor="middle" fill="#fff4db" font-family="monospace" font-size="11">PLAY AGAIN ▸</text>
+      </svg>
+      <p class="cap">Strikeout key frame. Shows IMG-04 (swing and a miss) — ball lit outside the grid, STRIKEOUT stamp, Play again → Splash.</p>
+    </div>
+
+    <!-- W5 R2 SWING SELECT -->
+    <div class="wire">
+      <h4>W5 · R2 Swing select (three hex cards)</h4>
+      <svg viewBox="0 0 400 280" aria-label="Round 2 swing select wireframe">
+        <rect width="400" height="280" fill="#161329"/>
+        <rect x="0" y="0" width="400" height="32" fill="#1d1a36"/>
+        <text x="200" y="20" fill="#2aeaff" font-family="monospace" font-size="11" text-anchor="middle">JACKPOT $1,247  ◇  pulse</text>
+        <text x="200" y="56" fill="#fff4db" font-family="monospace" font-size="12" text-anchor="middle">SWING SELECT</text>
+        <!-- three hex cards -->
+        <g font-family="monospace" font-size="9" fill="#fff4db">
+          <polygon points="60,90 130,80 130,200 60,210 30,150" fill="#1d1a36" stroke="#2aeaff" stroke-width="1.5"/>
+          <text x="80" y="120" font-size="10">CONTACT</text>
+          <text x="80" y="138" fill="#2aeaff">76% · 1.25×</text>
+          <text x="80" y="156" fill="#9b97aa">low risk</text>
+          <text x="80" y="180" fill="#ffe054">payout $125</text>
+
+          <polygon points="180,90 250,80 250,200 180,210 150,150" fill="#1d1a36" stroke="#fb009f" stroke-width="1.5"/>
+          <text x="200" y="120" font-size="10">POWER</text>
+          <text x="200" y="138" fill="#fb009f">40% · 2.0×</text>
+          <text x="200" y="156" fill="#9b97aa">mid risk</text>
+          <text x="200" y="180" fill="#ffe054">payout $200</text>
+
+          <polygon points="300,90 370,80 370,200 300,210 270,150" fill="#1d1a36" stroke="#9500c6" stroke-width="1.5"/>
+          <text x="320" y="120" font-size="10">GRAND SLAM</text>
+          <text x="320" y="138" fill="#d59bff">0.5% · POOL</text>
+          <text x="320" y="156" fill="#9b97aa">progressive</text>
+          <text x="320" y="180" fill="#ffe054">wins $1,247</text>
+        </g>
+        <rect x="100" y="232" width="200" height="30" fill="#3a345b" stroke="#7a73a4" rx="15"/>
+        <text x="200" y="252" text-anchor="middle" fill="#cbc7d8" font-family="monospace" font-size="11">SWING ▸ (pick one)</text>
+      </svg>
+      <p class="cap">Three hex "holding device" cards — Contact (cyan), Power (magenta), Grand Slam (purple). Contact and Power show headline odds and the literal $ payout for the player's stake; Grand Slam shows the live <strong>progressive pool</strong> value (it pays the whole pool on HR, not a fixed multiplier). Swing CTA disabled until selection.</p>
+    </div>
+
+    <!-- W6 R2 OUTCOME -->
+    <div class="wire">
+      <h4>W6 · R2 Outcome (Win or Out)</h4>
+      <svg viewBox="0 0 400 280" aria-label="Round 2 outcome wireframe">
+        <rect width="400" height="280" fill="#161329"/>
+        <rect x="0" y="0" width="400" height="32" fill="#1d1a36"/>
+        <text x="200" y="20" fill="#ffe054" font-family="monospace" font-size="11" text-anchor="middle">JACKPOT $1,247  ★  HIT!</text>
+        <rect x="0" y="32" width="400" height="160" fill="#1a1734"/>
+        <text x="200" y="60" fill="#7a73a4" font-family="monospace" font-size="9" text-anchor="middle">[ IMG-05 — swing-and-a-hit key frame (reused for all R2 outcomes) ]</text>
+        <text x="200" y="120" fill="#ffe054" font-family="monospace" font-size="22" text-anchor="middle" font-weight="bold">HOME RUN!</text>
+        <text x="200" y="150" fill="#2aeaff" font-family="monospace" font-size="14" text-anchor="middle">+$1,247 (full pool)</text>
+        <text x="200" y="175" fill="#9b97aa" font-family="monospace" font-size="9" text-anchor="middle">out variant: "OUT" + payout $0  ·  on HR: pool reseeds to $1,000 after credit</text>
+        <rect x="60" y="208" width="280" height="34" fill="#0c0a1f" stroke="#2aeaff" rx="6"/>
+        <text x="200" y="230" fill="#fff4db" font-family="monospace" font-size="11" text-anchor="middle">TOTAL THIS HAND: +$1,292   ·   BALANCE: $2,292</text>
+        <rect x="130" y="248" width="140" height="28" fill="#fb009f" stroke="#fff4db" rx="14"/>
+        <text x="200" y="267" text-anchor="middle" fill="#fff4db" font-family="monospace" font-size="11">PLAY AGAIN ▸</text>
+      </svg>
+      <p class="cap">Outcome label uses one of: <code>SINGLE / DOUBLE / TRIPLE / HOME RUN! / OUT</code>. All five variants share IMG-05 (swing and a hit) as the background — including OUT, since the bat did make contact and the result was simply fielded. The outcome is conveyed entirely by the overlay stamp, jackpot ticker, audio sting, and confetti particle burst. On HR the player wins the entire live pool; total-this-hand sums R1 + R2 wins. Play again resets bets and returns to W2 (R1 bet placement), keeping balance and the (reseeded) jackpot pool.</p>
+    </div>
+
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="brand">07 · Brand tokens</h2>
+  <!-- ============================================================ -->
+  <p class="muted">All values sourced from the Vegas Infinite Brand Bible 2025 (v02). Use these as the only colours and type the game introduces.</p>
+
+  <h3>Color palette</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#fb009f"></div><div class="name">Magenta</div><div class="hex">#fb009f · 251 0 159</div></div>
+    <div class="sw"><div class="chip" style="background:#f8050e"></div><div class="name">Red</div><div class="hex">#f8050e · 248 5 14</div></div>
+    <div class="sw"><div class="chip" style="background:#fc6b23"></div><div class="name">Orange</div><div class="hex">#fc6b23 · 252 107 35</div></div>
+    <div class="sw"><div class="chip" style="background:#ff6944"></div><div class="name">Coral</div><div class="hex">#ff6944 · 255 105 68</div></div>
+    <div class="sw"><div class="chip" style="background:#ffe054"></div><div class="name">Yellow</div><div class="hex">#ffe054 · 255 224 84</div></div>
+    <div class="sw"><div class="chip" style="background:#9500c6"></div><div class="name">Purple</div><div class="hex">#9500c6 · 149 0 198</div></div>
+    <div class="sw"><div class="chip" style="background:#173dff"></div><div class="name">Blue</div><div class="hex">#173dff · 23 61 255</div></div>
+    <div class="sw"><div class="chip" style="background:#2aeaff"></div><div class="name">Cyan</div><div class="hex">#2aeaff · 42 234 255</div></div>
+    <div class="sw"><div class="chip" style="background:#fff4db"></div><div class="name">Cream (body)</div><div class="hex">#fff4db · 255 244 219</div></div>
+    <div class="sw"><div class="chip" style="background:#000;border:1px solid #333"></div><div class="name">Flood BG</div><div class="hex">#000000</div></div>
+  </div>
+  <p class="small muted" style="margin-top:14px;">Rule from VI bible: <em>"Use the brand cream for body copy, never white."</em> All long-form text in the UI uses <code>#fff4db</code>. Pure white is reserved for highlights / glow / focus states.</p>
+
+  <h3>Typography</h3>
+  <table>
+    <thead><tr><th>Role</th><th>Font</th><th>Treatment</th></tr></thead>
+    <tbody>
+      <tr><td>Heading (H1–H2)</td><td><strong>Capitana Extra Bold</strong></td><td>ALL CAPS, letter-spacing ≈ 0.05em (50 tracking units)</td></tr>
+      <tr><td>Subheading (H3–H4)</td><td>Capitana Regular</td><td>ALL CAPS, letter-spacing ≈ 0.05em</td></tr>
+      <tr><td>Body</td><td>Capitana Light</td><td>Sentence case, normal tracking</td></tr>
+      <tr><td>Numbers / payouts</td><td>Capitana Extra Bold</td><td>Tabular figures preferred where supported</td></tr>
+    </tbody>
+  </table>
+
+  <h3>GFX motifs (from the VI Toolkit)</h3>
+  <ul>
+    <li><strong>Linear neon streaks</strong> — diagonal light trails, used as transition wipes and as background motion on splash / outcome.</li>
+    <li><strong>Halftone dot circles</strong> — decorative dotted gradients; used as subtle pitch-zone backing.</li>
+    <li><strong>Splash GFX</strong> — soft, blurred multi-colour blobs (magenta/orange/purple/cyan). Use behind hero copy and as celebration burst.</li>
+    <li><strong>Neon hex "holding devices"</strong> — the primary card/frame shape. Used for the three R2 swing options, settings, modals.</li>
+  </ul>
+
+  <h3>Mascot rules</h3>
+  <ul>
+    <li><strong>Team VI</strong> = the <strong>Ducky</strong> (yellow rubber duck, batter). Wears VI team uniform — black puffer vest, white pinstripe baseball pants, black batting helmet, with the VI spade-and-infinity logo (<code>vi.jpg</code>) on the helmet and vest.</li>
+    <li><strong>Team Lucky Logic</strong> = the <strong>Blubos</strong> (translucent blue cubic robots, pitcher + catcher). Wear Lucky Logic team uniform — black baseball jersey, white pinstripe pants, black cap, with the Lucky Logic green-cube logo (<code>luckylogic.jpg</code>) on the cap and jersey. <em>Do not</em> use Meta Avatars — the AI Challenge brief explicitly excludes them.</li>
+    <li>The matchup is framed as Team VI (the player's Ducky at bat) versus Team Lucky Logic (the Blubo defence on the mound and behind the plate).</li>
+    <li>Ducky never speaks dialogue. Sportscaster-style on-screen text handles narrative beats ("FULL COUNT", "CONTACT!", "GONE!").</li>
+  </ul>
+
+  <h3>Voice (UI copy)</h3>
+  <p class="small">Confident · Energetic · Welcoming · Informative · Authentic · Passionate · Easy-Going.</p>
+  <p>Short, punchy, sportscaster energy. Examples:</p>
+  <ul>
+    <li>"Step into the box."</li>
+    <li>"Full count. One pitch."</li>
+    <li>"That ball is <em>gone.</em>"</li>
+    <li>"Sat one down looking."</li>
+    <li>"Crowd's on its feet."</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2 id="assets-img">08 · Assets — Images</h2>
+  <!-- ============================================================ -->
+  <p class="muted"><strong>Three-tier pipeline.</strong> First generate the two character images (IMG-01 Blubo, IMG-02 Ducky) using the user-supplied character base images <em>plus</em> the team logos as input references — the prompts only describe <em>action</em> and <em>outfit</em>, since colour, face, body and silhouette flow through from the inputs. Next generate the establishing scene (IMG-03 — "before the pitch") using the character images from step 1 as inputs — the prompt only describes <em>composition</em> and <em>stadium</em>, since the characters are already locked. Finally generate the two key-frame outcome shots (IMG-04 swing-and-a-miss, IMG-05 swing-and-a-hit) using IMG-03 as the scene reference and IMG-02 as the character reference — these images must read as direct continuations of the same camera, same stadium, same Ducky, captured a fraction of a second later in the at-bat.<br>
+  <strong>User-supplied reference inputs</strong> (already in repo root, used by the prompts below — not shipped in the build):
+  <code>blubo.jpg</code> (Blubo character base),
+  <code>rubber duck.jpg</code> (Ducky character base),
+  <code>vi.jpg</code> (Team VI logo — spade-and-infinity),
+  <code>luckylogic.jpg</code> (Team Lucky Logic logo — green cube).<br>
+  <strong>6 images to generate</strong> (IMG-01…IMG-06); IMG-07…IMG-10 are rendered in-build with CSS/SVG. Generator column: <code>CD</code> = Claude Design, <code>MJ</code> = Midjourney, <code>NB</code> = Nano Banana / image edit, <code>build</code> = CSS/SVG, no generation.</p>
+
+  <table class="asset-table">
+    <thead><tr><th>ID</th><th>Use</th><th>Size · Format</th><th>Gen</th><th>Prompt</th></tr></thead>
+    <tbody>
+
+      <tr>
+        <td>IMG-01</td>
+        <td>Blubo character — Team Lucky Logic, pitcher pose. Reused as character reference for IMG-03 (before the pitch) and as the distant pitcher in IMG-04 (swing and a miss) and IMG-05 (swing and a hit).</td>
+        <td>1536×1536 · 1:1 · PNG (transparent)</td>
+        <td>NB/CD</td>
+        <td>
+          <span class="prompt-label">Image prompt · inputs: <code>blubo.jpg</code> (character base) + <code>luckylogic.jpg</code> (team logo)</span>
+<pre class="prompt">Use the supplied Blubo image (blubo.jpg) as the input reference for the character — preserve the Blubo's colour, face, body shape, antenna, and overall silhouette exactly. Do not restyle the character itself.
+
+Team: this Blubo plays for Team Lucky Logic. Use the supplied Lucky Logic logo (luckylogic.jpg, the green cube with two white eyes) as the input reference for all team branding — match it exactly anywhere it appears on the uniform.
+
+Outfit: dress the Blubo in a black baseball jersey with the Lucky Logic green-cube logo (~25% jersey width) centred on the chest, white pinstripe baseball pants, and a black baseball cap with the same Lucky Logic logo on the front. Keep the outfit clean and tightly fitted to the Blubo's cubic body. No other logos.
+
+Action: pose the Blubo in a confident pitcher's stance — pre-windup / set position. Head up, mitt forward at chest, body squared to the camera, baseball cradled in the mitt. Three-quarter view, full body, centred composition, drop shadow underneath.
+
+Output: isolated on a transparent background, soft volumetric neon rim-light (magenta + cyan). No text. This image will be reused as the character reference for IMG-03 (before-the-pitch scene), IMG-04 (swing and a miss), and IMG-05 (swing and a hit).</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-02</td>
+        <td>Ducky character — Team VI, batting stance. Reused as character reference for IMG-04 (swing and a miss) and IMG-05 (swing and a hit).</td>
+        <td>1536×1536 · 1:1 · PNG (transparent)</td>
+        <td>NB/CD</td>
+        <td>
+          <span class="prompt-label">Image prompt · inputs: <code>rubber duck.jpg</code> (character base) + <code>vi.jpg</code> (team logo)</span>
+<pre class="prompt">Use the supplied Ducky image (rubber duck.jpg) as the input reference for the character — preserve the duck's yellow colour, bill, eyes, body shape, and overall silhouette exactly. Do not restyle the character itself.
+
+Team: this Ducky plays for Team VI. Use the supplied VI logo (vi.jpg, the iridescent blue spade-and-infinity mark) as the input reference for all team branding — match it exactly anywhere it appears on the uniform.
+
+Outfit: dress the Ducky in a black puffer vest (zipper, ribbed collar) with the VI spade-and-infinity logo (~30% vest width) centred on the chest, white pinstripe baseball pants, and a black batting helmet with the same VI logo on the front. Add a slim wooden baseball bat held over the shoulder. No other logos.
+
+Action: pose the Ducky in a baseball batting stance — eyeing an unseen pitcher, bat cocked over the shoulder, slightly anticipatory. Three-quarter side view, full body, slight low angle. Keep the stance neutral enough that the same image reads acceptably under any outcome stamp (contact / strikeout / single / double / triple / home run / out).
+
+Output: isolated on a transparent background, neon magenta + yellow rim-light. No text. This image will be reused as the character reference for IMG-04 (swing and a miss) and IMG-05 (swing and a hit).</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-03</td>
+        <td>Before the pitch — behind-the-plate establishing scene; stadium + pitcher Blubo + Ducky in batter's box (all baked in; no catcher in frame)</td>
+        <td>1920×1080 · 16:9 · JPG/WebP</td>
+        <td>NB/CD/MJ</td>
+        <td>
+          <span class="prompt-label">Image prompt · inputs: IMG-01 (Blubo character) + IMG-02 (Ducky character)</span>
+<pre class="prompt">Use IMG-01 (the Blubo character — Team Lucky Logic, with the green-cube logo on jersey + cap) as the input reference for the pitcher, and IMG-02 (the Ducky character — Team VI, with the VI spade-and-infinity logo on vest + helmet) as the input reference for the hitter. Do not redesign either character or their uniforms — match the look and team branding from IMG-01 and IMG-02 exactly. Aspect 16:9. No text.
+
+Composition: a first-person view from behind home plate looking out at the pitcher's mound. The camera sits at the catcher's position but the catcher itself is NOT shown — no chest protector, no mitt, no silhouette, no body in the foreground. The frame reads as an unobstructed view of the matchup.
+• Pitcher Blubo (from IMG-01, full pitcher outfit and stance unchanged): standing on the floodlit mound at mid-distance, centred horizontally.
+• Ducky hitter (from IMG-02, full batting stance and Team VI uniform unchanged): standing in the batter's box on the right side of the frame, three-quarter back-view so the VI logo on the back of the vest is partly visible, bat cocked over the shoulder, facing the pitcher. Neon magenta + yellow rim-light on its silhouette.
+
+Stadium: a stylised Vegas Infinite arena — floodlit dark grass diamond, neon pink and cyan light trails sweeping across the upper bleachers, a galaxy of out-of-focus phone screens in the crowd, deep purple sky. Dark cinematic exposure.
+
+Leave the centre of the frame (between the Ducky on the right and the pitcher's mound) clear of busy detail to accommodate the 3×3 strike-zone grid overlay (IMG-07, CSS) and chip markers composited in at runtime. This is the single static establishing shot for W2 (bet placement) AND the visual anchor for IMG-04 (swing and a miss) and IMG-05 (swing and a hit) — those frames re-use this exact camera angle and stadium so the at-bat reads as a single continuous shot. The pitch motion between IMG-03 and IMG-04/05 is delivered by VID-01.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-04</td>
+        <td>Swing and a miss — strikeout key frame (IMG-03's camera, captured a beat later: Ducky's bat sailing through empty air, ball whizzing past untouched)</td>
+        <td>1920×1080 · 16:9 · JPG/WebP</td>
+        <td>NB/CD/MJ</td>
+        <td>
+          <span class="prompt-label">Image prompt · inputs: IMG-03 (scene reference) + IMG-02 (Ducky character) + IMG-01 (Blubo character, distant)</span>
+<pre class="prompt">Use IMG-03 as the scene reference — match its camera, stadium, lighting, and overall framing exactly. This image must read as the next frame in the same continuous shot, captured a fraction of a second after the pitch arrives. Use IMG-02 as the character reference for the Ducky (full Team VI uniform — black puffer vest with VI spade-and-infinity logo, white pinstripe pants, black batting helmet) and IMG-01 for the distant pitcher Blubo. Do not redesign any character, uniform, or team branding. Aspect 16:9. No text.
+
+Camera: first-person view from behind home plate looking out toward the pitcher's mound, identical to IMG-03. The catcher is still NOT shown — no chest protector, no mitt, no silhouette in the foreground.
+
+Action: the Ducky has just completed a full swing-through and missed the ball. Bat extended out front past where the strike zone would be, body rotated through the swing, weight pulled forward off the back foot, batting helmet slightly off-axis. Reads unmistakably as "swung and missed". The ball is a streak of motion-blurred white passing through the strike-zone region untouched, heading back toward the camera position (just past the bat), with a faint cyan light trail behind it. Distant pitcher Blubo on the floodlit mound in post-release follow-through, glove side dropped, watching the result.
+
+Stadium: identical to IMG-03 — same stylised Vegas Infinite arena, same floodlit dark grass diamond, same neon pink and cyan light trails sweeping across the upper bleachers, same out-of-focus phone-screen galaxy in the crowd, same deep purple sky. Slightly dimmer cinematic exposure to underscore the strikeout mood, but the lighting setup is unchanged.
+
+Leave the centre of the frame (between the Ducky and the pitcher's mound) clear of busy detail to accommodate the 3×3 strike-zone grid overlay (IMG-07, CSS) and the STRIKEOUT outcome stamp (IMG-09, CSS) layered on at runtime.
+
+This frame is used exclusively for W4 R1 resolve (strikeout variant). The outcome is conveyed by overlay stamp + audio sting, supported by the swing-and-a-miss pose.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-05</td>
+        <td>Swing and a hit — contact / R2 outcome key frame (IMG-03's camera, captured a beat later: bat connecting, ball launching toward outfield)</td>
+        <td>1920×1080 · 16:9 · JPG/WebP</td>
+        <td>NB/CD/MJ</td>
+        <td>
+          <span class="prompt-label">Image prompt · inputs: IMG-03 (scene reference) + IMG-02 (Ducky character) + IMG-01 (Blubo character, distant)</span>
+<pre class="prompt">Use IMG-03 as the scene reference — match its camera, stadium, lighting, and overall framing exactly. This image must read as the next frame in the same continuous shot, captured the instant the bat connects with the ball. Use IMG-02 as the character reference for the Ducky (full Team VI uniform — black puffer vest with VI spade-and-infinity logo, white pinstripe pants, black batting helmet) and IMG-01 for the distant pitcher Blubo. Do not redesign any character, uniform, or team branding. Aspect 16:9. No text.
+
+Camera: first-person view from behind home plate looking out toward the pitcher's mound, identical to IMG-03. The catcher is still NOT shown.
+
+Action: the Ducky has caught the ball clean. Bat angled out toward the pitcher at the moment of impact, with a bright neon impact flash where bat meets ball; hips rotating through, weight transferring forward, helmet locked on the ball. Reads unmistakably as "barreled it". The ball is launching away from the camera back toward the outfield, motion-blurred, trailing a magenta + yellow neon streak. Distant pitcher Blubo on the floodlit mound in post-release follow-through, head tracking the ball.
+
+Stadium: identical to IMG-03 — same stylised Vegas Infinite arena, same floodlit dark grass diamond, same neon pink and cyan light trails sweeping across the upper bleachers, same out-of-focus phone-screen galaxy in the crowd, same deep purple sky. Slightly brighter, more triumphant cinematic exposure (crowd-on-its-feet energy), but the lighting setup is unchanged.
+
+Leave the centre of the frame clear of busy detail to accommodate the 3×3 strike-zone grid overlay (IMG-07, CSS — in W4 contact variant only) and the outcome stamp (IMG-09, CSS — used for CONTACT / SINGLE / DOUBLE / TRIPLE / HOME RUN / OUT) layered on at runtime.
+
+This single frame is re-used for W4 R1 resolve (contact variant) AND W6 R2 outcome (all variants — single / double / triple / home run / out — including OUT, since the bat made contact and the result was simply fielded). The specific outcome is conveyed by overlay stamp + audio sting + confetti, not by a pose change.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-06</td>
+        <td>Game logo wordmark</td>
+        <td>2048×1024 · 2:1 · PNG (transparent)</td>
+        <td>CD</td>
+        <td>
+<pre class="prompt">A bold logo lockup that reads "STRIKE ZONE" on top in a wide Capitana-style geometric sans, gradient-filled magenta-to-orange-to-yellow with subtle inner bevel, and "DUCKS AT BAT" underneath in a thinner cyan all-caps. Above the wordmark, the Vegas Infinite spade-and-infinity logo in gold. Below, a small cream-coloured baseball stitch motif arching under the words. Transparent background. No drop shadow.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-07</td>
+        <td>Strike-zone grid overlay</td>
+        <td>—</td>
+        <td>build</td>
+        <td>
+          <span class="prompt-label">Rendered in-build (no image generation needed)</span>
+<pre class="prompt">A 3×3 strike-zone grid built with CSS Grid (or inline SVG). Each cell is a rounded square with a 1.5px neon-cyan (#2aeaff) tubular border, faint cyan inner glow (box-shadow: inset 0 0 12px rgba(42,234,255,.25)), subtle scanline texture inside (repeating-linear-gradient at ~3% opacity), and a tiny diamond/spade endpoint at each line corner (SVG marker or CSS pseudo-element). On bet placement, hovered/selected cells brighten (border + glow intensify, fill becomes 8% magenta #fb009f). On resolve, the winning cell pulses cyan (contact) or red (strikeout) via a CSS keyframe.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-08</td>
+        <td>Chip denomination icons (4 chips)</td>
+        <td>—</td>
+        <td>build</td>
+        <td>
+          <span class="prompt-label">Rendered in-build (no image generation needed)</span>
+<pre class="prompt">Four poker-style chip icons rendered as inline SVG (or CSS radial-gradient circles). Top-down view with a slight inner bevel (radial-gradient highlight at ~30% top) and a rope edge (dashed circle border at ~40% opacity). Each chip has the VI gold-infinity glyph centred (single SVG path, reused). Colours: $1 cream/white edge #fff4db · $5 cyan #2aeaff · $25 magenta #fb009f · $100 gold-yellow #ffe054. Active state is pure CSS — add a cyan box-shadow glow ring and transform: scale(1.08) on the .active modifier, no separate asset needed.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-09</td>
+        <td>Outcome stamps (CONTACT! · STRIKEOUT · SINGLE · DOUBLE · TRIPLE · HOME RUN!)</td>
+        <td>—</td>
+        <td>build</td>
+        <td>
+          <span class="prompt-label">Rendered in-build (no image generation needed)</span>
+<pre class="prompt">Render as CSS text: Capitana Extra Bold, all-caps, ~5° forward lean, with an SVG baseball-stitch underline. Colours per label: CONTACT! cyan #2aeaff · STRIKEOUT magenta #fb009f with a slash overlay · SINGLE cream #fff4db · DOUBLE cyan #2aeaff · TRIPLE yellow #ffe054 · HOME RUN! gradient gold-to-magenta via background-clip: text + drop-shadow glow halo.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>IMG-10</td>
+        <td>Jackpot banner / ticker treatment</td>
+        <td>—</td>
+        <td>build</td>
+        <td>
+          <span class="prompt-label">Rendered in-build (no image generation needed)</span>
+<pre class="prompt">A horizontal ribbon at top-centre: flex container with two children — "JACKPOT" left in cyan #2aeaff Capitana Extra Bold; "$1,000,000" right in cream #fff4db tabular numerals with a gentle cyan text-shadow pulse (CSS keyframe). Background is a slim translucent dark bar (rgba(12,10,31,.72)) with a neon hex-pattern via repeating SVG background (cyan at ~8% opacity). Border-radius ~12px; padding 6–10px. No image asset.</pre>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="assets-vid">09 · Assets — Videos</h2>
+  <!-- ============================================================ -->
+  <p class="muted"><strong>MVP scope:</strong> only one video is required — <code>VID-01</code>, the R1 pitch sequence (it is the hero "full count" cinematic). All other dynamic moments — R2 swing reveal, outcome celebrations, splash background — are handled with static pose images (see §08) + audio stings (see §10) + on-screen typography. Additional videos may be added post-MVP as polish; they are intentionally out of scope here. Clip spec: 16:9, 1920×1080, MP4/H.264, no audio (audio is added separately from §10). Generated with <strong>ByteDance Seedance 2.0</strong> (<code>bytedance/seedance-2.0/reference-to-video</code>) via fal.ai. Reference images are passed alongside the prompt and addressed inline by token (<code>@Image1</code>, <code>@Image2</code>, …) for character likeness and scene-composition lock — same convention as the <code>from IMG-XX</code> cues in §08. <strong>Duration workflow:</strong> Seedance 2.0's minimum generation length is 4 seconds, so VID-01 is generated raw at <code>5s</code> and ffmpeg-trimmed to the final <code>2.5s</code> deliverable spec.</p>
+
+  <table class="asset-table">
+    <thead><tr><th>ID</th><th>Use</th><th>Duration · Format</th><th>Gen</th><th>Prompt</th></tr></thead>
+    <tbody>
+
+      <tr>
+        <td>VID-01</td>
+        <td>Pitch sequence (catcher cam)</td>
+        <td>2.5s · MP4 · loopless</td>
+        <td>Seedance 2.0</td>
+        <td>
+<pre class="prompt prompt-veo">Refs: @Image1 = IMG-01 (Blubo pitcher character + Team Lucky Logic uniform lock).
+
+Single continuous take. Camera at home-plate height, ~30 ft from the mound, slight upward tilt — catcher-cam framing. Blubo — exact likeness, cap, antenna, and uniform from @Image1 — fills the upper two-thirds of the frame, chest-up centred. No batter, no catcher, no umpire, no duck — Blubo is the only character.
+
+Beat 1 (0–1s): Blubo stares straight at the camera, glove pressed to chest. The cube-face's star-shaped LED eyes flicker once. Tense stillness.
+Beat 2 (1–2.5s): Upper body shifts as the leg lifts (mostly off-frame at the bottom); shoulders coil and rotate toward camera. Slight slow-motion (~80% speed) builds tension.
+Beat 3 (2.5–3.4s): Arm whips forward at full speed; ball releases from his hand directly toward the lens. Cyan and magenta light streaks fan off the release point.
+Beat 4 (3.4–4.5s): Ball grows fast toward the camera, motion-blurred with a long cyan light trail. Blubo shrinks behind it in follow-through.
+Beat 5 (4.5–5s): Frame freezes for one beat just before impact — the ball fills about a quarter of the frame, Blubo small behind it.
+
+Background: stylised dark backdrop, deep purple-to-black gradient. Two soft floodlight glows at the upper corners. Faint horizontal cyan and magenta neon light-streaks behind him suggesting a stadium without resolving any architecture. No crowd, no mound dirt readable.
+
+Cinematic, neon, slight motion blur, no on-screen text. 16:9, 1080p, 5 seconds (raw generation length; trimmed to 2.5s in post).</pre>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="assets-aud">10 · Assets — Audio</h2>
+  <!-- ============================================================ -->
+  <p class="muted">SFX kept short and punchy. Music bed long enough to loop seamlessly. Generators (all via <strong>fal.ai</strong>): <code>fal-ai/elevenlabs/sound-effects</code> for crowd, whooshes, cracks, and one-shot SFX (≤22s per call); <code>fal-ai/stable-audio</code> for the ambient bed and short musical stingers (≤47s per call). <em>Note: Suno is the wrong tool here — it only generates structured songs, not ambient loops or SFX. Any "synth shimmer / cyan tint" overlays mentioned in SFX prompts below are layered in post (DAW), not asked of the generator.</em></p>
+
+  <table class="asset-table">
+    <thead><tr><th>ID</th><th>Use</th><th>Length · Format</th><th>Gen</th><th>Prompt</th></tr></thead>
+    <tbody>
+
+      <tr>
+        <td>AUD-01</td>
+        <td>Stadium ambient bed (loop)</td>
+        <td>60s loop · OGG/MP3 <span class="muted">(gen 47s, crossfade-loop to 60s)</span></td>
+        <td>Stable Audio</td>
+        <td>
+<pre class="prompt prompt-fal">A nighttime baseball-stadium ambient loop with a subtle neon-arcade synth pad underneath. Big distant crowd murmur with occasional cheers, a faint organ stab here and there, electronic shimmer in the high end. No drums, no melody, no vocals. Cinematic, anticipatory, "full count" tension. Loopable, 60 seconds.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>AUD-02</td>
+        <td>Pitch whoosh</td>
+        <td>0.6s · WAV</td>
+        <td>ElevenLabs SFX</td>
+        <td>
+<pre class="prompt prompt-fal">A fast doppler whoosh of a baseball flying past a microphone, with a tiny cyan-synth shimmer overlay. Dry, punchy, ends crisp. 600ms.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>AUD-03</td>
+        <td>Bat crack — soft / solid / booming</td>
+        <td>3 × 0.5s · WAV</td>
+        <td>ElevenLabs SFX</td>
+        <td>
+<pre class="prompt prompt-fal">Three variants of a wooden bat hitting a baseball. (a) Soft contact, low-key tap. (b) Solid line-drive crack, bright wood. (c) Massive home-run crack with extended reverb tail and a tiny magenta-synth pitch lift in the tail. Each 400–600ms.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>AUD-04</td>
+        <td>Chip drop / UI click</td>
+        <td>0.2s · WAV</td>
+        <td>ElevenLabs SFX <span class="muted">(or free library)</span></td>
+        <td>
+<pre class="prompt prompt-fal">A short, satisfying casino chip drop with a soft synth click on top. Two-layer: physical clack + a cream-coloured digital tick. 200ms, no tail.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>AUD-05</td>
+        <td>Jackpot stinger</td>
+        <td>3s · WAV/MP3</td>
+        <td>Stable Audio</td>
+        <td>
+<pre class="prompt prompt-fal">A 3-second triumphant musical stinger in the Vegas Infinite vibe: ascending arpeggiated synth riff with a brass-stab climax, sparkle FX on the tail, retro-arcade meets modern EDM. Ends on a sustained chord with a touch of sub-bass.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>AUD-06</td>
+        <td>Strikeout sting</td>
+        <td>1.2s · WAV</td>
+        <td>Stable Audio</td>
+        <td>
+<pre class="prompt prompt-fal">A short descending two-note sting suggesting "you're out" — minor third drop on a synth pad, ending with a low thump. Cinematic, slightly tongue-in-cheek (not depressing). 1.2 seconds.</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>AUD-07</td>
+        <td>Crowd reactions — set of 3</td>
+        <td>3 × 1.5s · WAV</td>
+        <td>ElevenLabs SFX</td>
+        <td>
+<pre class="prompt prompt-fal">Three short crowd reactions, recorded in a large stadium. (a) Anticipatory gasp / hush as the ball is hit. (b) Eruption of cheers and whistles for a home run. (c) Groaning "ohhh" disappointment for a caught fly ball. Each ~1.5 seconds.</pre>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="delivery">11 · Delivery</h2>
+  <!-- ============================================================ -->
+  <p>
+    Strike Zone: Ducks at Bat ships as a web game playable in any modern browser on desktop or
+    mobile, deployed on <strong>Vercel</strong>. A single session takes about 30 seconds — no
+    download, no sign-in friction, the game loads instantly when the player taps the link.
+  </p>
+
+  <!-- ============================================================ -->
+  <h2 id="verify">12 · Brief alignment</h2>
+  <!-- ============================================================ -->
+  <p class="muted">How Strike Zone: Ducks at Bat answers the AI Challenge brief.</p>
+  <ul>
+    <li>✅ Original game — no existing casino floor analog.</li>
+    <li>✅ VI branded — palette, type, mascot all sourced from VI Brand Bible 2025.</li>
+    <li>✅ Web-based, deployed on Vercel.</li>
+    <li>✅ Trailer-ready — the R1 pitch cinematic (VID-01) doubles as the trailer hero shot. Additional swing/celebration videos are post-MVP polish, not blockers.</li>
+  </ul>
+
+  <hr class="sep">
+  <p class="small muted">Doc v1.1 · Product brief for Strike Zone: Ducks at Bat. For any open question (chip denominations, jackpot seed, balance reset rules, jackpot wording, R2 stake source), this doc is the source of truth.</p>
+
+</div>
+</body>
+</html>
