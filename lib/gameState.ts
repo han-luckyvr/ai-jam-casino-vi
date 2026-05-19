@@ -34,6 +34,7 @@ export type GameState = {
   bets: Bet[];
   activeChip: ChipValue;
   pitchOutcome: PitchOutcome | null;
+  r1Winnings: number;
   swingChoice: SwingOption | null;
   r2Outcome: R2Outcome | null;
   lastHandWinnings: number;
@@ -44,6 +45,7 @@ export const initialState: GameState = {
   bets: [],
   activeChip: 5,
   pitchOutcome: null,
+  r1Winnings: 0,
   swingChoice: null,
   r2Outcome: null,
   lastHandWinnings: 0,
@@ -54,7 +56,7 @@ export type GameAction =
   | { type: "CLEAR_BETS" }
   | { type: "SET_ACTIVE_CHIP"; chip: ChipValue }
   | { type: "COMMIT_PITCH"; pitchOutcome: PitchOutcome }
-  | { type: "RESOLVE_PITCH" }
+  | { type: "RESOLVE_PITCH"; r1Winnings: number }
   | { type: "CHOOSE_SWING"; option: SwingOption }
   | { type: "RESOLVE_SWING"; r2Outcome: R2Outcome; winnings: number }
   | { type: "PLAY_AGAIN" };
@@ -64,6 +66,7 @@ function resetForNewHand(state: GameState): GameState {
     ...state,
     bets: [],
     pitchOutcome: null,
+    r1Winnings: 0,
     swingChoice: null,
     r2Outcome: null,
   };
@@ -89,7 +92,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "RESOLVE_PITCH":
       if (state.screen !== "R1_PITCH") return state;
-      return { ...state, screen: "R1_RESOLVE" };
+      return { ...state, screen: "R1_RESOLVE", r1Winnings: action.r1Winnings };
 
     case "CHOOSE_SWING":
       return { ...state, swingChoice: action.option };
@@ -107,7 +110,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         case "SPLASH":
           return { ...resetForNewHand(state), screen: "R1_BET" };
         case "R1_RESOLVE":
-          if (state.pitchOutcome?.inZone) {
+          if (state.r1Winnings > 0) {
             return { ...state, screen: "R2_SWING" };
           }
           return { ...resetForNewHand(state), screen: "SPLASH" };

@@ -19,11 +19,12 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
   const resolve = useCallback(() => {
     if (resolvedRef.current) return;
     resolvedRef.current = true;
-    if (state.pitchOutcome?.inZone === true) {
-      const winnings = resolveR1Payout(state.bets, state.pitchOutcome.cell);
-      if (winnings > 0) setBalance((b) => b + winnings);
-    }
-    dispatch({ type: "RESOLVE_PITCH" });
+    const winnings =
+      state.pitchOutcome?.inZone === true
+        ? resolveR1Payout(state.bets, state.pitchOutcome.cell)
+        : 0;
+    if (winnings > 0) setBalance((b) => b + winnings);
+    dispatch({ type: "RESOLVE_PITCH", r1Winnings: winnings });
   }, [state.bets, state.pitchOutcome, dispatch, setBalance]);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { resolveR1Payout, sumStaked } from "@/lib/bets";
+import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
 import type { GameAction, GameState } from "@/lib/gameState";
 
@@ -13,8 +13,8 @@ export default function R1Resolve({ state, dispatch }: Props) {
   const [balance] = useBalance();
   const staked = sumStaked(state.bets);
   const outcome = state.pitchOutcome;
-  const contact = outcome !== null && outcome.inZone;
-  const winnings = contact ? resolveR1Payout(state.bets, outcome.cell) : 0;
+  const winnings = state.r1Winnings;
+  const contact = winnings > 0;
 
   const onContinue = () => dispatch({ type: "PLAY_AGAIN" });
 
@@ -65,7 +65,7 @@ export default function R1Resolve({ state, dispatch }: Props) {
           boxSizing: "border-box",
         }}
       >
-        <ResolveGrid outcome={outcome} />
+        <ResolveGrid outcome={outcome} contact={contact} />
 
         {contact ? (
           <div
@@ -140,8 +140,10 @@ export default function R1Resolve({ state, dispatch }: Props) {
 
 function ResolveGrid({
   outcome,
+  contact,
 }: {
   outcome: GameState["pitchOutcome"];
+  contact: boolean;
 }) {
   const cell =
     outcome && outcome.inZone ? outcome.cell : null;
@@ -173,7 +175,8 @@ function ResolveGrid({
         }}
       >
         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((c) => {
-          const isWinning = c === cell;
+          const isLanding = c === cell;
+          const isWinning = isLanding && contact;
           return (
             <div
               key={c}
@@ -185,7 +188,7 @@ function ResolveGrid({
                   : { border: "1px solid rgba(42,234,255,0.32)" }),
               }}
             >
-              {isWinning && <Ball />}
+              {isLanding && <Ball />}
             </div>
           );
         })}
