@@ -14,9 +14,10 @@ type Props = {
   onSelectChip: (chip: ChipValue) => void;
   onClear: () => void;
   canClear: boolean;
+  locked?: boolean;
 };
 
-export default function ChipRack({ activeChip, onSelectChip, onClear, canClear }: Props) {
+export default function ChipRack({ activeChip, onSelectChip, onClear, canClear, locked = false }: Props) {
   return (
     <div
       style={{
@@ -36,7 +37,12 @@ export default function ChipRack({ activeChip, onSelectChip, onClear, canClear }
               type="button"
               aria-label={`$${value} chip${active ? " (active)" : ""}`}
               aria-pressed={active}
-              onClick={() => onSelectChip(value)}
+              aria-disabled={locked || undefined}
+              disabled={locked}
+              onClick={() => {
+                if (locked) return;
+                onSelectChip(value);
+              }}
               style={{
                 width: 56,
                 height: 56,
@@ -44,12 +50,16 @@ export default function ChipRack({ activeChip, onSelectChip, onClear, canClear }
                 border: "none",
                 padding: 0,
                 background: "transparent",
-                cursor: "pointer",
-                boxShadow: active
-                  ? "0 0 0 2px var(--bg), 0 0 0 4px var(--cyan), 0 0 18px rgba(42,234,255,0.55)"
-                  : "0 4px 10px rgba(0,0,0,0.5)",
-                transform: active ? "scale(1.08)" : "scale(1)",
+                cursor: locked ? "not-allowed" : "pointer",
+                boxShadow: locked
+                  ? "0 4px 10px rgba(0,0,0,0.5)"
+                  : active
+                    ? "0 0 0 2px var(--bg), 0 0 0 4px var(--cyan), 0 0 18px rgba(42,234,255,0.55)"
+                    : "0 4px 10px rgba(0,0,0,0.5)",
+                transform: !locked && active ? "scale(1.08)" : "scale(1)",
                 transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                opacity: locked ? 0.4 : 1,
+                filter: locked ? "grayscale(1)" : undefined,
               }}
             >
               <ChipFace value={value} bg={bg} fg={fg} />
@@ -59,11 +69,14 @@ export default function ChipRack({ activeChip, onSelectChip, onClear, canClear }
       </div>
       <button
         type="button"
-        onClick={onClear}
-        disabled={!canClear}
+        onClick={() => {
+          if (locked) return;
+          onClear();
+        }}
+        disabled={locked || !canClear}
         style={{
           background: "transparent",
-          color: canClear ? "var(--cyan)" : "var(--muted)",
+          color: !locked && canClear ? "var(--cyan)" : "var(--muted)",
           border: "1px solid var(--rule-strong)",
           padding: "10px 22px",
           borderRadius: 999,
@@ -72,8 +85,8 @@ export default function ChipRack({ activeChip, onSelectChip, onClear, canClear }
           fontSize: 11,
           letterSpacing: "0.18em",
           textTransform: "uppercase",
-          cursor: canClear ? "pointer" : "not-allowed",
-          opacity: canClear ? 1 : 0.45,
+          cursor: !locked && canClear ? "pointer" : "not-allowed",
+          opacity: !locked && canClear ? 1 : 0.45,
           transition: "opacity 0.15s ease",
         }}
       >

@@ -113,7 +113,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           if (state.r1Winnings > 0) {
             return { ...state, screen: "R2_SWING" };
           }
-          return { ...resetForNewHand(state), screen: "SPLASH" };
+          return { ...resetForNewHand(state), screen: "R1_BET" };
         case "R2_RESOLVE":
           return { ...resetForNewHand(state), screen: "R1_BET" };
         default:

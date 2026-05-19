@@ -5,6 +5,7 @@ import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
 import { useSfx } from "@/lib/audio";
 import type { GameAction, GameState } from "@/lib/gameState";
+import BetDock from "./BetDock";
 
 type Props = {
   state: GameState;
@@ -50,13 +51,6 @@ export default function R1Resolve({ state, dispatch }: Props) {
         }}
       />
 
-      <HudReadout
-        side="left"
-        label="Balance"
-        value={`$${balance.toLocaleString("en-US")}`}
-      />
-      <HudReadout side="right" label="Staked" value={`$${staked.toLocaleString("en-US")}`} />
-
       <div
         style={{
           position: "relative",
@@ -68,7 +62,7 @@ export default function R1Resolve({ state, dispatch }: Props) {
           alignItems: "center",
           justifyContent: "center",
           gap: "28px",
-          padding: "96px 24px 48px",
+          padding: "96px 24px 140px",
           boxSizing: "border-box",
         }}
       >
@@ -120,27 +114,21 @@ export default function R1Resolve({ state, dispatch }: Props) {
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={onContinue}
-          style={{
-            background: "var(--magenta)",
-            color: "var(--cream)",
-            border: "1px solid var(--cream)",
-            padding: "16px 36px",
-            borderRadius: 999,
-            fontFamily: "var(--font-montserrat), sans-serif",
-            fontWeight: 800,
-            fontSize: 13,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            cursor: "pointer",
-            boxShadow: "0 0 24px rgba(251,0,159,0.45)",
-          }}
-        >
-          {contact ? "Continue ▸" : "Play Again ▸"}
-        </button>
       </div>
+
+      <BetDock
+        balance={balance}
+        staked={staked}
+        activeChip={state.activeChip}
+        onSelectChip={() => {}}
+        onClear={() => {}}
+        canClear={false}
+        locked
+        primaryAction={{
+          label: contact ? "Continue ▸" : "Play Again ▸",
+          onClick: onContinue,
+        }}
+      />
     </main>
   );
 }
@@ -265,54 +253,3 @@ function Ball() {
   );
 }
 
-function HudReadout({
-  side,
-  label,
-  value,
-  valueColor = "var(--cream)",
-}: {
-  side: "left" | "right";
-  label: string;
-  value: string;
-  valueColor?: string;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 18,
-        [side]: 20,
-        zIndex: 9,
-        display: "flex",
-        alignItems: "baseline",
-        gap: 8,
-        fontFamily: "var(--font-montserrat), sans-serif",
-        textShadow: "0 2px 6px rgba(0,0,0,0.7)",
-        pointerEvents: "none",
-      }}
-    >
-      <span
-        style={{
-          color: "var(--muted)",
-          fontWeight: 700,
-          fontSize: 10,
-          letterSpacing: "0.22em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          color: valueColor,
-          fontWeight: 800,
-          fontSize: 15,
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.04em",
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}

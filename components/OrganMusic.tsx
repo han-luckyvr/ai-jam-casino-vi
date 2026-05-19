@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useMuted } from "@/lib/persistence";
 import type { Screen } from "@/lib/gameState";
 
-const PLAY_SCREENS: ReadonlySet<Screen> = new Set(["SPLASH", "R1_BET"]);
+const PLAY_SCREENS: ReadonlySet<Screen> = new Set(["R1_BET"]);
 
 type Props = {
   screen: Screen;
@@ -12,12 +12,12 @@ type Props = {
 
 export default function OrganMusic({ screen }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const consumedRef = useRef(false);
+  const prevScreenRef = useRef<Screen | null>(null);
   const [muted] = useMuted();
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio || muted || consumedRef.current) return;
+    if (!audio || muted || !PLAY_SCREENS.has(screen)) return;
     let kick: ((e?: Event) => void) | null = null;
     const cleanup = () => {
       if (!kick) return;
@@ -36,17 +36,16 @@ export default function OrganMusic({ screen }: Props) {
       window.addEventListener("touchstart", kick, { once: true });
     });
     return cleanup;
-  }, [muted]);
+  }, [muted, screen]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     const inPlayZone = PLAY_SCREENS.has(screen);
-    if (!inPlayZone && audio.currentTime > 0) {
-      consumedRef.current = true;
-    }
-    const shouldPlay = inPlayZone && !muted && !consumedRef.current;
-    if (shouldPlay) {
+    const enteringPlayZone = inPlayZone && prevScreenRef.current !== screen;
+    prevScreenRef.current = screen;
+    if (inPlayZone && !muted) {
+      if (enteringPlayZone) audio.currentTime = 0;
       audio.play().catch(() => {});
     } else {
       audio.pause();
@@ -62,9 +61,6 @@ export default function OrganMusic({ screen }: Props) {
       style={{ display: "none" }}
       onLoadedMetadata={(e) => {
         e.currentTarget.volume = 0.45;
-      }}
-      onEnded={() => {
-        consumedRef.current = true;
       }}
     />
   );

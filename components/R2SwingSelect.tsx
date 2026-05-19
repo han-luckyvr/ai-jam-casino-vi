@@ -10,6 +10,7 @@ import type {
   R2Outcome,
   SwingOption,
 } from "@/lib/gameState";
+import BetDock from "./BetDock";
 
 type Props = {
   state: GameState;
@@ -148,9 +149,6 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
         }}
       />
 
-      <HudReadout side="left" label="Balance" value={fmt(balance)} />
-      <HudReadout side="right" label="Stake" value={fmt(r2Stake)} />
-
       <div
         style={{
           position: "relative",
@@ -162,7 +160,7 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
           alignItems: "center",
           justifyContent: "center",
           gap: "28px",
-          padding: "96px 24px 48px",
+          padding: "96px 24px 140px",
           boxSizing: "border-box",
         }}
       >
@@ -217,31 +215,22 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={onSwing}
-          disabled={selected === null}
-          style={{
-            background: selected !== null ? "var(--magenta)" : "rgba(251,0,159,0.35)",
-            color: "var(--cream)",
-            border: "1px solid var(--cream)",
-            padding: "16px 36px",
-            borderRadius: 999,
-            fontFamily: "var(--font-montserrat), sans-serif",
-            fontWeight: 800,
-            fontSize: 13,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            cursor: selected !== null ? "pointer" : "not-allowed",
-            opacity: selected !== null ? 1 : 0.55,
-            boxShadow: selected !== null ? "0 0 24px rgba(251,0,159,0.45)" : "none",
-            transition: "opacity 0.15s ease, box-shadow 0.15s ease",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          ▸ Swing
-        </button>
       </div>
+
+      <BetDock
+        balance={balance}
+        staked={r2Stake}
+        activeChip={state.activeChip}
+        onSelectChip={() => {}}
+        onClear={() => {}}
+        canClear={false}
+        locked
+        primaryAction={{
+          label: "▸ Swing",
+          onClick: onSwing,
+          disabled: selected === null,
+        }}
+      />
     </main>
   );
 }
@@ -440,52 +429,3 @@ function SwingRow({
   );
 }
 
-function HudReadout({
-  side,
-  label,
-  value,
-}: {
-  side: "left" | "right";
-  label: string;
-  value: string;
-}) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 18,
-        [side]: 20,
-        zIndex: 9,
-        display: "flex",
-        alignItems: "baseline",
-        gap: 8,
-        fontFamily: "var(--font-montserrat), sans-serif",
-        textShadow: "0 2px 6px rgba(0,0,0,0.7)",
-        pointerEvents: "none",
-      }}
-    >
-      <span
-        style={{
-          color: "var(--muted)",
-          fontWeight: 700,
-          fontSize: 10,
-          letterSpacing: "0.22em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </span>
-      <span
-        style={{
-          color: "var(--cream)",
-          fontWeight: 800,
-          fontSize: 15,
-          fontVariantNumeric: "tabular-nums",
-          letterSpacing: "0.04em",
-        }}
-      >
-        {value}
-      </span>
-    </div>
-  );
-}

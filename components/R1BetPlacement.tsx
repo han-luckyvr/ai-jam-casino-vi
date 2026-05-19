@@ -7,7 +7,7 @@ import { useBalance, useJackpot } from "@/lib/persistence";
 import { useSfx } from "@/lib/audio";
 import type { Bet, ChipValue, GameAction, GameState } from "@/lib/gameState";
 import StrikeZoneGrid from "./StrikeZoneGrid";
-import ChipRack from "./ChipRack";
+import BetDock from "./BetDock";
 
 type Props = {
   state: GameState;
@@ -111,54 +111,19 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
         />
       </div>
 
-      <div className="bet-dock" aria-label="Player dock">
-        <div className="dock-readout">
-          <span className="dr-label">Balance</span>
-          <span className="dr-value">${balance.toLocaleString("en-US")}</span>
-        </div>
-        <div className="dock-center">
-          <ChipRack
-            activeChip={state.activeChip}
-            onSelectChip={selectChip}
-            onClear={onClear}
-            canClear={state.bets.length > 0}
-          />
-          <button
-            type="button"
-            onClick={onThrowPitch}
-            disabled={!canThrowPitch}
-            style={{
-              background: canThrowPitch ? "var(--magenta)" : "rgba(251,0,159,0.35)",
-              color: "var(--cream)",
-              border: "1px solid var(--cream)",
-              padding: "14px 30px",
-              borderRadius: 999,
-              fontFamily: "var(--font-montserrat), sans-serif",
-              fontWeight: 800,
-              fontSize: 12,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              cursor: canThrowPitch ? "pointer" : "not-allowed",
-              opacity: canThrowPitch ? 1 : 0.55,
-              boxShadow: canThrowPitch ? "0 0 24px rgba(251,0,159,0.45)" : "none",
-              transition: "opacity 0.15s ease, box-shadow 0.15s ease",
-              fontVariantNumeric: "tabular-nums",
-              whiteSpace: "nowrap",
-            }}
-          >
-            ▸ Throw Pitch
-          </button>
-        </div>
-        <div className="dock-readout right">
-          <span className="dr-label">Staked</span>
-          <span
-            className="dr-value"
-            style={{ color: staked > balance ? "var(--magenta)" : undefined }}
-          >
-            ${staked.toLocaleString("en-US")}
-          </span>
-        </div>
-      </div>
+      <BetDock
+        balance={balance}
+        staked={staked}
+        activeChip={state.activeChip}
+        onSelectChip={selectChip}
+        onClear={onClear}
+        canClear={state.bets.length > 0}
+        primaryAction={{
+          label: "▸ Throw Pitch",
+          onClick: onThrowPitch,
+          disabled: !canThrowPitch,
+        }}
+      />
 
       {tooltip !== null && (
         <div
