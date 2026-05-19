@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useGameState } from "@/lib/gameState";
 import JackpotTicker from "@/components/JackpotTicker";
+import CountOverlay from "@/components/CountOverlay";
 import OrganMusic from "@/components/OrganMusic";
 import ScreenTransition from "@/components/ScreenTransition";
 import Splash from "@/components/Splash";
@@ -47,7 +48,10 @@ export default function Home() {
   return (
     <>
       {state.screen !== "SPLASH" && (
-        <JackpotTicker pulse={jackpotPulse && state.screen === "R2_SWING"} />
+        <>
+          <JackpotTicker pulse={jackpotPulse && state.screen === "R2_SWING"} />
+          <CountOverlay />
+        </>
       )}
       <OrganMusic screen={state.screen} />
       <ScreenTransition screen={state.screen} skipFirst>

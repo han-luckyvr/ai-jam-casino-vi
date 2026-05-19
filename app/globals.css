@@ -485,3 +485,134 @@ a {
     display: none;
   }
 }
+
+/* ===== Count overlay (Lucky Logic Baseball League broadcast bug) ===== */
+
+.count-bug {
+  position: fixed;
+  top: 32px;
+  left: 32px;
+  z-index: 10;
+  width: 260px;
+  background: linear-gradient(180deg, #0a2354 0%, #061838 100%);
+  border: 2px solid #000;
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(255, 199, 44, 0.4);
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  pointer-events: none;
+}
+.count-header {
+  background: linear-gradient(180deg, #ffd54a 0%, #ffc72c 100%);
+  color: #061838;
+  padding: 7px 12px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #000;
+}
+.count-mark {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+}
+.count-mark-eyebrow {
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #061838;
+  opacity: 0.78;
+}
+.count-mark-main {
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #061838;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+.count-inning {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1;
+  color: #061838;
+}
+.count-arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 9px solid #061838;
+}
+.count-arrow.bot {
+  border-bottom: 0;
+  border-top: 9px solid #061838;
+}
+.count-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+.count-row + .count-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 8px;
+}
+.count-label {
+  font-family: var(--font-barlow-condensed), "Barlow Condensed", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  color: #ffc72c;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.count-squares {
+  display: flex;
+  gap: 5px;
+}
+.count-sq {
+  width: 14px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+.count-sq.on {
+  background: #ffc72c;
+  border-color: #ffd54a;
+  box-shadow:
+    0 0 6px rgba(255, 199, 44, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 520px) {
+  .count-bug {
+    top: 18px;
+    left: 14px;
+    width: 218px;
+  }
+  .count-mark-main {
+    font-size: 17px;
+  }
+  .count-label {
+    font-size: 16px;
+  }
+}

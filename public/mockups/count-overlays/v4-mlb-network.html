@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Count Overlay V4 · MLB Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body { font-family: "Inter", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+
+  /* ===== Faux TV scene ===== */
+  .scene { position: fixed; inset: 0; overflow: hidden; }
+  .sky { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 60% at 50% 90%, #0c1f0c 0%, #050b05 60%, #000 100%), linear-gradient(180deg, #0a1228 0%, #050811 55%, #000 100%); }
+  .grass { position: absolute; left: -10%; right: -10%; bottom: 0; height: 62%; background: radial-gradient(ellipse 70% 80% at 50% 100%, #2a5a30 0%, #1d4022 40%, #0e2412 75%, transparent 100%); }
+  .infield { position: absolute; left: 50%; bottom: 0; width: 95%; height: 38%; transform: translateX(-50%); background: radial-gradient(ellipse 60% 90% at 50% 100%, #7b5a35 0%, #5a3f22 50%, transparent 75%); opacity: 0.55; }
+  .mound { position: absolute; left: 50%; bottom: 32%; transform: translateX(-50%); width: 230px; height: 56px; background: radial-gradient(ellipse, #8a6840 0%, #5a3f22 70%, transparent 100%); opacity: 0.7; filter: blur(2px); }
+  .foul-line-l, .foul-line-r { position: absolute; bottom: 0; width: 2px; height: 56%; background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.85) 100%); transform-origin: bottom center; }
+  .foul-line-l { left: 50%; transform: rotate(-32deg); }
+  .foul-line-r { left: 50%; transform: rotate(32deg); }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
+  .pitcher-tag { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; }
+  .pitcher-tag b { color: rgba(255,255,255,0.75); font-weight: 700; margin: 0 8px; }
+
+  /* ===== V4: MLB Network ===== */
+  .mlbn-bug {
+    position: fixed;
+    top: 32px; right: 32px;
+    width: 230px;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow:
+      0 10px 28px rgba(0,0,0,0.5),
+      0 2px 6px rgba(0,0,0,0.3),
+      0 0 0 1px rgba(255,255,255,0.08);
+    font-family: "Inter", sans-serif;
+  }
+  /* Red strip with MLB shield + inning */
+  .mlbn-top {
+    display: flex; align-items: stretch;
+    background: #002d72;
+    color: #fff;
+  }
+  /* Simulated MLB shield */
+  .mlbn-shield {
+    width: 46px;
+    background: linear-gradient(180deg, #002d72 0%, #001f50 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 6px 0;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+  .mlbn-shield-svg {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mlbn-shield-svg svg { width: 100%; height: 100%; }
+  .mlbn-inning-block {
+    flex: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px;
+    background: linear-gradient(180deg, #e4002b 0%, #b80022 100%);
+  }
+  .mlbn-inning-label {
+    font-family: "Oswald", "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+  }
+  .mlbn-inning-num {
+    display: flex; align-items: center; gap: 6px;
+    font-family: "Oswald", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .mlbn-arrow {
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 9px solid #fff;
+  }
+  .mlbn-arrow.bot { border-bottom: 0; border-top: 9px solid #fff; }
+
+  /* White count body */
+  .mlbn-body {
+    background: #f5f6f8;
+    color: #002d72;
+    padding: 11px 14px 13px;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .mlbn-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .mlbn-row-label {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #002d72;
+  }
+  .mlbn-dots { display: flex; gap: 6px; }
+  .mlbn-dot {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #cbd0d9;
+  }
+  .mlbn-dot.on-ball { background: #002d72; border-color: #002d72; }
+  .mlbn-dot.on-strike { background: #e4002b; border-color: #e4002b; }
+  .mlbn-dot.on-out { background: #002d72; border-color: #002d72; }
+  /* Bottom strip with MLB Network wordmark */
+  .mlbn-footer {
+    background: #002d72;
+    color: #fff;
+    padding: 5px 14px 6px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(0,0,0,0.15);
+  }
+  .mlbn-footer .net { color: #e4002b; }
+
+  /* ===== Footer chrome ===== */
+  .back { position: fixed; top: 24px; left: 24px; color: rgba(255,255,255,0.55); text-decoration: none; font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; padding: 8px 14px; border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 100; }
+  .back:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .variant-tag { position: fixed; bottom: 14px; left: 14px; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="sky"></div>
+    <div class="grass"></div>
+    <div class="infield"></div>
+    <div class="mound"></div>
+    <div class="foul-line-l"></div>
+    <div class="foul-line-r"></div>
+    <div class="vignette"></div>
+    <div class="pitcher-tag">Pitcher <b>M. SCHERZER</b> · 4-Seam · <b>97 MPH</b></div>
+  </div>
+
+  <a class="back" href="index.html">← Back</a>
+  <div class="variant-tag">V4 · MLB Network</div>
+
+  <!-- MLB Network count overlay -->
+  <div class="mlbn-bug" aria-label="Top of 7th, 2 balls, 1 strike, 1 out">
+    <div class="mlbn-top">
+      <div class="mlbn-shield">
+        <div class="mlbn-shield-svg">
+          <!-- Simulated MLB shield: silhouette of batter on red/blue background -->
+          <svg viewBox="0 0 32 36" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4 Q2 2 4 2 L28 2 Q30 2 30 4 L30 26 Q30 30 16 34 Q2 30 2 26 Z" fill="#fff" stroke="#fff" stroke-width="1"/>
+            <path d="M3 5 Q3 3 5 3 L27 3 Q29 3 29 5 L29 26 Q29 29 16 33 Q3 29 3 26 Z" fill="#e4002b"/>
+            <path d="M3 5 Q3 3 5 3 L16 3 L16 33 Q3 29 3 26 Z" fill="#002d72"/>
+            <!-- batter silhouette (simplified) -->
+            <g fill="#fff">
+              <circle cx="20" cy="11" r="2"/>
+              <path d="M18 13 L22 13 L23 18 L21 22 L21 27 L19 27 L19 22 L17 18 Z"/>
+              <path d="M14 9 L24 17 L23 18 L13 10 Z"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="mlbn-inning-block">
+        <div class="mlbn-inning-label">Top</div>
+        <div class="mlbn-inning-num">
+          <span class="mlbn-arrow top"></span>
+          <span>7</span>
+        </div>
+      </div>
+    </div>
+    <div class="mlbn-body">
+      <div class="mlbn-row">
+        <span class="mlbn-row-label">Balls</span>
+        <div class="mlbn-dots">
+          <span class="mlbn-dot on-ball"></span>
+          <span class="mlbn-dot on-ball"></span>
+          <span class="mlbn-dot"></span>
+        </div>
+      </div>
+      <div class="mlbn-row">
+        <span class="mlbn-row-label">Strikes</span>
+        <div class="mlbn-dots">
+          <span class="mlbn-dot on-strike"></span>
+          <span class="mlbn-dot"></span>
+        </div>
+      </div>
+      <div class="mlbn-row">
+        <span class="mlbn-row-label">Outs</span>
+        <div class="mlbn-dots">
+          <span class="mlbn-dot on-out"></span>
+          <span class="mlbn-dot"></span>
+        </div>
+      </div>
+    </div>
+    <div class="mlbn-footer">
+      <span>MLB <span class="net">NETWORK</span></span>
+      <span>LIVE</span>
+    </div>
+  </div>
+</body>
+</html>

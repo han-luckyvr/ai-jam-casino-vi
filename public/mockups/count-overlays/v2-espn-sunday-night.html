@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Count Overlay V2 · ESPN Sunday Night Baseball</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body { font-family: "Roboto Condensed", "Roboto", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+
+  /* ===== Faux TV scene (shared across variants) ===== */
+  .scene { position: fixed; inset: 0; overflow: hidden; }
+  .sky { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 60% at 50% 90%, #0c1f0c 0%, #050b05 60%, #000 100%), linear-gradient(180deg, #0a1228 0%, #050811 55%, #000 100%); }
+  .grass { position: absolute; left: -10%; right: -10%; bottom: 0; height: 62%; background: radial-gradient(ellipse 70% 80% at 50% 100%, #2a5a30 0%, #1d4022 40%, #0e2412 75%, transparent 100%); }
+  .infield { position: absolute; left: 50%; bottom: 0; width: 95%; height: 38%; transform: translateX(-50%); background: radial-gradient(ellipse 60% 90% at 50% 100%, #7b5a35 0%, #5a3f22 50%, transparent 75%); opacity: 0.55; }
+  .mound { position: absolute; left: 50%; bottom: 32%; transform: translateX(-50%); width: 230px; height: 56px; background: radial-gradient(ellipse, #8a6840 0%, #5a3f22 70%, transparent 100%); opacity: 0.7; filter: blur(2px); }
+  .foul-line-l, .foul-line-r { position: absolute; bottom: 0; width: 2px; height: 56%; background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.85) 100%); transform-origin: bottom center; }
+  .foul-line-l { left: 50%; transform: rotate(-32deg); }
+  .foul-line-r { left: 50%; transform: rotate(32deg); }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
+  .pitcher-tag { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; }
+  .pitcher-tag b { color: rgba(255,255,255,0.75); font-weight: 700; margin: 0 8px; }
+
+  /* ===== V2: ESPN Sunday Night Baseball ===== */
+  .espn-bug {
+    position: fixed;
+    bottom: 56px; left: 56px;
+    display: flex;
+    height: 78px;
+    font-family: "Roboto Condensed", "Roboto", sans-serif;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.55));
+  }
+  /* ESPN red lozenge with arrow + inning */
+  .espn-inning {
+    background: linear-gradient(180deg, #d70a17 0%, #b80813 100%);
+    color: #fff;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 20px 0 22px;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+    padding-right: 28px;
+    position: relative;
+  }
+  .espn-arrow {
+    width: 0; height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 11px solid #fff;
+    transform: translateY(-1px);
+  }
+  .espn-arrow.bot {
+    border-bottom: 0;
+    border-top: 11px solid #fff;
+  }
+  .espn-inning-text {
+    font-family: "Roboto Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    font-style: italic;
+  }
+  /* Black slab with count */
+  .espn-count {
+    background: linear-gradient(180deg, #161616 0%, #050505 100%);
+    display: flex; align-items: center;
+    padding: 0 22px 0 18px;
+    margin-left: -10px;
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+    gap: 16px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .espn-stat { display: flex; align-items: center; gap: 8px; }
+  .espn-letter {
+    font-family: "Roboto Condensed", sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: #cfcfcf;
+    line-height: 1;
+  }
+  .espn-dots { display: flex; flex-direction: column; gap: 3px; }
+  .espn-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .espn-dot.on { background: #ffd23f; border-color: #ffd23f; box-shadow: 0 0 4px rgba(255,210,63,0.7); }
+  /* "ESPN" wordmark accent */
+  .espn-mark {
+    background: linear-gradient(180deg, #d70a17 0%, #b80813 100%);
+    color: #fff;
+    display: flex; align-items: center;
+    padding: 0 16px 0 8px;
+    margin-left: -10px;
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+    font-family: "Roboto Condensed", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== Footer chrome ===== */
+  .back {
+    position: fixed; top: 24px; right: 24px;
+    color: rgba(255,255,255,0.55); text-decoration: none;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid rgba(255,255,255,0.18); border-radius: 8px;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 100;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+  .back:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .variant-tag {
+    position: fixed; top: 14px; left: 14px;
+    color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 6px 12px; background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="sky"></div>
+    <div class="grass"></div>
+    <div class="infield"></div>
+    <div class="mound"></div>
+    <div class="foul-line-l"></div>
+    <div class="foul-line-r"></div>
+    <div class="vignette"></div>
+    <div class="pitcher-tag">Pitcher <b>M. SCHERZER</b> · 4-Seam · <b>97 MPH</b></div>
+  </div>
+
+  <a class="back" href="index.html">← Back</a>
+  <div class="variant-tag">V2 · ESPN Sunday Night</div>
+
+  <!-- ESPN Sunday Night Baseball count overlay -->
+  <div class="espn-bug" aria-label="Top of 7th, 2 balls, 1 strike, 1 out">
+    <div class="espn-inning">
+      <span class="espn-arrow top"></span>
+      <span class="espn-inning-text">7TH</span>
+    </div>
+    <div class="espn-count">
+      <div class="espn-stat">
+        <span class="espn-letter">B</span>
+        <div class="espn-dots">
+          <span class="espn-dot on"></span>
+          <span class="espn-dot on"></span>
+          <span class="espn-dot"></span>
+        </div>
+      </div>
+      <div class="espn-stat">
+        <span class="espn-letter">S</span>
+        <div class="espn-dots">
+          <span class="espn-dot on"></span>
+          <span class="espn-dot"></span>
+        </div>
+      </div>
+      <div class="espn-stat">
+        <span class="espn-letter">O</span>
+        <div class="espn-dots">
+          <span class="espn-dot on"></span>
+          <span class="espn-dot"></span>
+        </div>
+      </div>
+    </div>
+    <div class="espn-mark">ESPN</div>
+  </div>
+</body>
+</html>

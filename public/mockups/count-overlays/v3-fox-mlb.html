@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Count Overlay · Lucky Logic Baseball League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body { font-family: "Barlow Condensed", "Inter", system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+
+  /* ===== Faux TV scene ===== */
+  .scene { position: fixed; inset: 0; overflow: hidden; }
+  .sky { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 60% at 50% 90%, #0c1f0c 0%, #050b05 60%, #000 100%), linear-gradient(180deg, #0a1228 0%, #050811 55%, #000 100%); }
+  .grass { position: absolute; left: -10%; right: -10%; bottom: 0; height: 62%; background: radial-gradient(ellipse 70% 80% at 50% 100%, #2a5a30 0%, #1d4022 40%, #0e2412 75%, transparent 100%); }
+  .infield { position: absolute; left: 50%; bottom: 0; width: 95%; height: 38%; transform: translateX(-50%); background: radial-gradient(ellipse 60% 90% at 50% 100%, #7b5a35 0%, #5a3f22 50%, transparent 75%); opacity: 0.55; }
+  .mound { position: absolute; left: 50%; bottom: 32%; transform: translateX(-50%); width: 230px; height: 56px; background: radial-gradient(ellipse, #8a6840 0%, #5a3f22 70%, transparent 100%); opacity: 0.7; filter: blur(2px); }
+  .foul-line-l, .foul-line-r { position: absolute; bottom: 0; width: 2px; height: 56%; background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0.85) 100%); transform-origin: bottom center; }
+  .foul-line-l { left: 50%; transform: rotate(-32deg); }
+  .foul-line-r { left: 50%; transform: rotate(32deg); }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%); pointer-events: none; }
+  .pitcher-tag { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; color: rgba(255,255,255,0.45); text-transform: uppercase; font-family: "Inter", sans-serif; }
+  .pitcher-tag b { color: rgba(255,255,255,0.75); font-weight: 700; margin: 0 8px; }
+
+  /* ===== V3: chosen broadcast bug ===== */
+  .fox-bug {
+    position: fixed;
+    top: 32px; left: 32px;
+    width: 260px;
+    background: linear-gradient(180deg, #0a2354 0%, #061838 100%);
+    border: 2px solid #000;
+    box-shadow:
+      0 12px 26px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 0 0 1px rgba(255,199,44,0.4);
+    font-family: "Barlow Condensed", sans-serif;
+  }
+  /* Yellow header strip */
+  .fox-header {
+    background: linear-gradient(180deg, #ffd54a 0%, #ffc72c 100%);
+    color: #061838;
+    padding: 7px 12px 6px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid #000;
+  }
+  .fox-mark {
+    display: flex; flex-direction: column;
+    gap: 1px;
+    line-height: 1;
+  }
+  .fox-mark-eyebrow {
+    font-family: "Barlow Condensed", "Inter", sans-serif;
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #061838;
+    opacity: 0.78;
+  }
+  .fox-mark-main {
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    font-size: 19px;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: #061838;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.08);
+  }
+  .fox-inning {
+    display: flex; align-items: center; gap: 5px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 800;
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .fox-arrow {
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 9px solid #061838;
+  }
+  .fox-arrow.bot { border-bottom: 0; border-top: 9px solid #061838; }
+
+  /* Count body */
+  .fox-body {
+    padding: 12px 14px 14px;
+    display: flex; flex-direction: column; gap: 9px;
+  }
+  .fox-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 0;
+  }
+  .fox-row + .fox-row { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 8px; }
+  .fox-label {
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    color: #ffc72c;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .fox-squares { display: flex; gap: 5px; }
+  .fox-sq {
+    width: 14px; height: 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.25);
+  }
+  .fox-sq.on {
+    background: #ffc72c;
+    border-color: #ffd54a;
+    box-shadow: 0 0 6px rgba(255,199,44,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+
+  /* ===== Footer chrome ===== */
+  .back { position: fixed; top: 24px; right: 24px; color: rgba(255,255,255,0.55); text-decoration: none; font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; padding: 8px 14px; border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 100; font-family: "Inter", sans-serif; }
+  .back:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .variant-tag { position: fixed; bottom: 14px; right: 14px; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; padding: 6px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; font-family: "Inter", sans-serif; }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="sky"></div>
+    <div class="grass"></div>
+    <div class="infield"></div>
+    <div class="mound"></div>
+    <div class="foul-line-l"></div>
+    <div class="foul-line-r"></div>
+    <div class="vignette"></div>
+    <div class="pitcher-tag">Pitcher <b>BLUBO #01</b> · 4-Seam · <b>97 MPH</b></div>
+  </div>
+
+  <a class="back" href="index.html">← Back</a>
+  <div class="variant-tag">CHOSEN · BROADCAST BUG</div>
+
+  <!-- Lucky Logic Baseball League count overlay -->
+  <div class="fox-bug" aria-label="Top of 7th, 0 balls, 0 strikes, 2 outs">
+    <div class="fox-header">
+      <div class="fox-mark">
+        <span class="fox-mark-eyebrow">Baseball League</span>
+        <span class="fox-mark-main">Lucky Logic</span>
+      </div>
+      <div class="fox-inning">
+        <span class="fox-arrow top"></span>
+        <span>7TH</span>
+      </div>
+    </div>
+    <div class="fox-body">
+      <div class="fox-row">
+        <span class="fox-label">BALL</span>
+        <div class="fox-squares">
+          <span class="fox-sq"></span>
+          <span class="fox-sq"></span>
+          <span class="fox-sq"></span>
+        </div>
+      </div>
+      <div class="fox-row">
+        <span class="fox-label">STRIKE</span>
+        <div class="fox-squares">
+          <span class="fox-sq"></span>
+          <span class="fox-sq"></span>
+        </div>
+      </div>
+      <div class="fox-row">
+        <span class="fox-label">OUT</span>
+        <div class="fox-squares">
+          <span class="fox-sq on"></span>
+          <span class="fox-sq on"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
