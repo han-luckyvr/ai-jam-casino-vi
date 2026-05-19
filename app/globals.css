@@ -63,3 +63,73 @@ a {
     opacity: 0.85;
   }
 }
+
+.scanline {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(42, 234, 255, 0) 0px,
+    rgba(42, 234, 255, 0) 3px,
+    rgba(42, 234, 255, 0.03) 3px,
+    rgba(42, 234, 255, 0.03) 4px
+  );
+}
+
+.zone-cell {
+  background: transparent;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+.zone-cell.placed {
+  background: rgba(251, 0, 159, 0.08);
+}
+.zone-cell:hover:not(:disabled) {
+  background: rgba(42, 234, 255, 0.06);
+  box-shadow: inset 0 0 14px rgba(42, 234, 255, 0.18);
+}
+.zone-cell.placed:hover:not(:disabled) {
+  background: rgba(251, 0, 159, 0.14);
+}
+
+.line-marker {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.line-marker:hover:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 0 14px rgba(42, 234, 255, 0.85);
+}
+.line-marker.placed:hover:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.line-placed,
+.line-preview {
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+  filter:
+    drop-shadow(0 0 4px currentColor)
+    drop-shadow(0 0 10px currentColor)
+    drop-shadow(0 0 18px currentColor);
+}
+.line-placed {
+  animation: line-pulse 1.6s ease-in-out infinite alternate;
+}
+.line-preview {
+  stroke-dasharray: 10 7;
+  opacity: 0.55;
+  animation: line-march 1.1s linear infinite;
+}
+@keyframes line-pulse {
+  from { opacity: 0.72; }
+  to   { opacity: 1; }
+}
+@keyframes line-march {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -34; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .line-placed,
+  .line-preview {
+    animation: none;
+  }
+}

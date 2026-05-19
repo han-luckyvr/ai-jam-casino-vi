@@ -5,12 +5,13 @@ import { rollPitch, rollSwing } from "@/lib/probabilities";
 import type { SwingOption } from "@/lib/gameState";
 import JackpotTicker from "@/components/JackpotTicker";
 import Splash from "@/components/Splash";
+import R1BetPlacement from "@/components/R1BetPlacement";
+import R1PitchVideo from "@/components/R1PitchVideo";
+import R1Resolve from "@/components/R1Resolve";
 
 const screenSummary: Record<string, string> = {
   SPLASH: "Tap to play.",
   R1_BET: "Place chips on zones and lines, then throw the pitch.",
-  R1_PITCH: "Pitch cinematic playing (VID-01).",
-  R1_RESOLVE: "Pitch landed. Continue (contact) or play again (strikeout).",
   R2_SWING: "Pick one of three swings.",
   R2_RESOLVE: "Swing resolved. Play another hand.",
 };
@@ -106,52 +107,13 @@ function renderScreen(
       return <Splash onTap={() => dispatch({ type: "PLAY_AGAIN" })} />;
 
     case "R1_BET":
-      return (
-        <main style={sectionStyle}>
-          <p style={eyebrowStyle}>Round 1 · Bet placement · W2</p>
-          <h1 style={titleStyle}>Place your bets</h1>
-          <p style={subtitleStyle}>{screenSummary.R1_BET}</p>
-          <button
-            style={buttonStyle}
-            onClick={() => dispatch({ type: "COMMIT_PITCH", pitchOutcome: rollPitch() })}
-          >
-            Throw pitch ▸
-          </button>
-          <button style={ghostButtonStyle} onClick={rngSanityCheck}>
-            RNG sanity check (console)
-          </button>
-        </main>
-      );
+      return <R1BetPlacement state={state} dispatch={dispatch} />;
 
     case "R1_PITCH":
-      return (
-        <main style={sectionStyle}>
-          <p style={eyebrowStyle}>Round 1 · Pitch · W3</p>
-          <h1 style={titleStyle}>Pitch cinematic</h1>
-          <p style={subtitleStyle}>{screenSummary.R1_PITCH}</p>
-          <button style={buttonStyle} onClick={() => dispatch({ type: "RESOLVE_PITCH" })}>
-            Pitch lands ▸
-          </button>
-        </main>
-      );
+      return <R1PitchVideo state={state} dispatch={dispatch} />;
 
-    case "R1_RESOLVE": {
-      const contact = state.pitchOutcome?.inZone === true;
-      const cellLabel =
-        state.pitchOutcome && state.pitchOutcome.inZone ? state.pitchOutcome.cell : "?";
-      return (
-        <main style={sectionStyle}>
-          <p style={eyebrowStyle}>Round 1 · Resolve · {contact ? "W4a" : "W4b"}</p>
-          <h1 style={{ ...titleStyle, color: contact ? "var(--yellow)" : "var(--magenta)" }}>
-            {contact ? `Contact! cell ${cellLabel}` : "Strikeout"}
-          </h1>
-          <p style={subtitleStyle}>{screenSummary.R1_RESOLVE}</p>
-          <button style={buttonStyle} onClick={() => dispatch({ type: "PLAY_AGAIN" })}>
-            {contact ? "Continue ▸" : "Play again ▸"}
-          </button>
-        </main>
-      );
-    }
+    case "R1_RESOLVE":
+      return <R1Resolve state={state} dispatch={dispatch} />;
 
     case "R2_SWING": {
       const choose = (option: SwingOption) => dispatch({ type: "CHOOSE_SWING", option });
@@ -221,6 +183,31 @@ export default function Home() {
     <>
       <JackpotTicker />
       {renderScreen(state, dispatch)}
+      <button
+        type="button"
+        onClick={rngSanityCheck}
+        title="Dev: log RNG distribution to console (M7 will remove)"
+        style={{
+          position: "fixed",
+          right: 10,
+          bottom: 10,
+          zIndex: 30,
+          padding: "4px 8px",
+          background: "rgba(12,10,31,0.7)",
+          color: "var(--muted)",
+          border: "1px solid var(--rule)",
+          borderRadius: 6,
+          fontFamily: "var(--font-montserrat), sans-serif",
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          cursor: "pointer",
+          opacity: 0.5,
+        }}
+      >
+        DEV · RNG
+      </button>
     </>
   );
 }

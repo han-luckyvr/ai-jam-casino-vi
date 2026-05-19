@@ -47,7 +47,7 @@ export default function JackpotTicker() {
           textShadow: "0 0 12px rgba(42, 234, 255, 0.45)",
         }}
       >
-        ${jackpot.toLocaleString("en-US")}
+        ${jackpot.toLocaleString("en-US", { maximumFractionDigits: 0 })}
       </span>
     </div>
   );
