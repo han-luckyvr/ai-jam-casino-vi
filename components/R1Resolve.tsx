@@ -42,16 +42,6 @@ export default function R1Resolve({ state, dispatch }: Props) {
           pointerEvents: "none",
         }}
       />
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 1,
-          background:
-            "radial-gradient(60% 50% at 50% 45%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 75%), linear-gradient(to bottom, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.75) 100%)",
-          pointerEvents: "none",
-        }}
-      />
 
       <HudReadout
         side="left"
