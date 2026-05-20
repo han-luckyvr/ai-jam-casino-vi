@@ -697,10 +697,10 @@ a {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 28px;
-  height: 28px;
-  margin-left: -14px;
-  margin-top: -14px;
+  width: 42px;
+  height: 42px;
+  margin-left: -21px;
+  margin-top: -21px;
   will-change: transform, opacity;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
   animation-name: chip-burst-fly;

@@ -9,10 +9,10 @@ type Props = {
 };
 
 const CHIP_COUNT: Record<ChipKind, number> = {
-  single: 30,
-  double: 66,
-  triple: 120,
-  hr: 250,
+  single: 50,
+  double: 75,
+  triple: 100,
+  hr: 200,
 };
 
 const BURST_SCALE: Record<ChipKind, number> = {
@@ -126,8 +126,8 @@ function ChipSvg({
   const bevelId = `chip-p-${id}-bevel`;
   return (
     <svg
-      width={28}
-      height={28}
+      width={42}
+      height={42}
       viewBox="0 0 56 56"
       aria-hidden
       style={{ display: "block", borderRadius: "50%" }}
