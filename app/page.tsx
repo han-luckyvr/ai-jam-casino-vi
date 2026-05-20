@@ -6,6 +6,7 @@ import { useMuted } from "@/lib/persistence";
 import JackpotTicker from "@/components/JackpotTicker";
 import CountOverlay from "@/components/CountOverlay";
 import OrganMusic from "@/components/OrganMusic";
+import SplashMusic from "@/components/SplashMusic";
 import ScreenTransition from "@/components/ScreenTransition";
 import Splash from "@/components/Splash";
 import R1BetPlacement from "@/components/R1BetPlacement";
@@ -56,6 +57,7 @@ export default function Home() {
         </>
       )}
       <OrganMusic screen={state.screen} />
+      <SplashMusic screen={state.screen} />
       <button
         aria-label={muted ? "Unmute sound" : "Mute sound"}
         aria-pressed={muted}
