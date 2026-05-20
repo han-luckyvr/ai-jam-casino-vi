@@ -72,7 +72,7 @@ function discStyle(total: number, size: number): React.CSSProperties {
     height: size,
     borderRadius: "50%",
     background: `radial-gradient(circle at 35% 30%, ${color}, ${color} 60%, rgba(0,0,0,0.3) 100%)`,
-    color: total >= 5 ? "var(--cream)" : "var(--bg)",
+    color: total >= 25 ? "var(--cream)" : "#000",
     fontFamily: "var(--font-montserrat), sans-serif",
     fontWeight: 800,
     fontSize: size > 30 ? 13 : 10,

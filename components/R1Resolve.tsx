@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default function R1Resolve({ state, dispatch }: Props) {
-  const [balance] = useBalance();
+  const [balance, setBalance] = useBalance();
   const staked = sumStaked(state.bets);
   const outcome = state.pitchOutcome;
   const winnings = state.r1Winnings;
@@ -126,6 +126,7 @@ export default function R1Resolve({ state, dispatch }: Props) {
         onClear={() => {}}
         canClear={false}
         locked
+        onReloadBalance={() => setBalance(1000)}
         primaryAction={{
           label: contact ? "Continue ▸" : "Play Again ▸",
           onClick: onContinue,

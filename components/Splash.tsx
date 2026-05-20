@@ -164,33 +164,6 @@ export default function Splash({ onTap }: Props) {
         Balance ${balance.toLocaleString("en-US")}
       </div>
 
-      <button
-        aria-label={muted ? "Unmute sound" : "Mute sound"}
-        aria-pressed={muted}
-        onClick={(e) => {
-          e.stopPropagation();
-          setMuted((m) => !m);
-        }}
-        style={{
-          position: "absolute",
-          right: 20,
-          bottom: 20,
-          zIndex: 3,
-          background: "transparent",
-          border: "none",
-          padding: 0,
-          color: muted ? "var(--muted)" : "var(--cream)",
-          fontFamily: "var(--font-montserrat), sans-serif",
-          fontWeight: 700,
-          fontSize: "12px",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          textShadow: "0 2px 6px rgba(0,0,0,0.6)",
-          cursor: "pointer",
-        }}
-      >
-        {muted ? "🔇 Muted" : "🔊 Sound"}
-      </button>
     </main>
   );
 }

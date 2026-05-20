@@ -213,6 +213,7 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
         onClear={() => {}}
         canClear={false}
         locked
+        onReloadBalance={() => setBalance(1000)}
       />
     </main>
   );

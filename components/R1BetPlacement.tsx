@@ -184,6 +184,7 @@ export default function R1BetPlacement({ state, dispatch }: Props) {
         onSelectChip={selectChip}
         onClear={onClear}
         canClear={state.bets.length > 0}
+        onReloadBalance={() => setBalance(1000)}
         primaryAction={{
           label: "▸ Throw Pitch",
           onClick: onThrowPitch,

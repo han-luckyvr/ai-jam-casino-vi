@@ -3,7 +3,7 @@
 import type { ChipValue } from "@/lib/gameState";
 
 const CHIPS: ReadonlyArray<{ value: ChipValue; bg: string; fg: string }> = [
-  { value: 5, bg: "var(--cream)", fg: "var(--bg)" },
+  { value: 5, bg: "var(--cream)", fg: "#000" },
   { value: 25, bg: "var(--red)", fg: "var(--cream)" },
   { value: 50, bg: "var(--blue)", fg: "var(--cream)" },
   { value: 100, bg: "var(--orange)", fg: "var(--cream)" },

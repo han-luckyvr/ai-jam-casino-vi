@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { useMuted } from "@/lib/persistence";
 
 export type SfxName =
@@ -26,26 +26,26 @@ const SFX_VOLUME: Record<SfxName, number> = {
   r2Win: 0.8,
 };
 
-export function useSfx(name: SfxName): () => void {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [muted] = useMuted();
+const audioCache = new Map<SfxName, HTMLAudioElement>();
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+function getAudio(name: SfxName): HTMLAudioElement | null {
+  if (typeof window === "undefined") return null;
+  if (!audioCache.has(name)) {
     const a = new Audio(SFX_SRC[name]);
     a.preload = "auto";
     a.volume = SFX_VOLUME[name];
-    audioRef.current = a;
-    return () => {
-      a.pause();
-      audioRef.current = null;
-    };
-  }, [name]);
+    audioCache.set(name, a);
+  }
+  return audioCache.get(name)!;
+}
+
+export function useSfx(name: SfxName): () => void {
+  const [muted] = useMuted();
 
   return useCallback(() => {
-    const a = audioRef.current;
+    const a = getAudio(name);
     if (!a || muted) return;
     a.currentTime = 0;
     a.play().catch(() => {});
-  }, [muted]);
+  }, [name, muted]);
 }

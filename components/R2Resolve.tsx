@@ -42,7 +42,7 @@ const OUT_TEXT_BY_SWING: Record<SwingOption, readonly string[]> = {
 };
 
 export default function R2Resolve({ state, dispatch }: Props) {
-  const [balance] = useBalance();
+  const [balance, setBalance] = useBalance();
   const outcome = state.r2Outcome;
   const r2Winnings = state.lastHandWinnings;
   const stake = state.r1Winnings;
@@ -183,6 +183,7 @@ export default function R2Resolve({ state, dispatch }: Props) {
         canClear={false}
         locked
         balanceDisplayDelta={balanceDelta}
+        onReloadBalance={() => setBalance(1000)}
         primaryAction={{
           label: "Play Again ▸",
           onClick: () => dispatch({ type: "PLAY_AGAIN" }),

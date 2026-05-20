@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useGameState } from "@/lib/gameState";
+import { useMuted } from "@/lib/persistence";
 import JackpotTicker from "@/components/JackpotTicker";
 import CountOverlay from "@/components/CountOverlay";
 import OrganMusic from "@/components/OrganMusic";
@@ -16,6 +17,7 @@ import R2Resolve from "@/components/R2Resolve";
 export default function Home() {
   const [state, dispatch] = useGameState();
   const [jackpotPulse, setJackpotPulse] = useState(false);
+  const [muted, setMuted] = useMuted();
 
   let screen: React.ReactNode = null;
   switch (state.screen) {
@@ -54,6 +56,30 @@ export default function Home() {
         </>
       )}
       <OrganMusic screen={state.screen} />
+      <button
+        aria-label={muted ? "Unmute sound" : "Mute sound"}
+        aria-pressed={muted}
+        onClick={() => setMuted((m) => !m)}
+        style={{
+          position: "fixed",
+          top: 20,
+          right: 20,
+          zIndex: 100,
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          color: muted ? "var(--muted)" : "var(--cream)",
+          fontFamily: "var(--font-montserrat), sans-serif",
+          fontWeight: 700,
+          fontSize: "20px",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          textShadow: "0 2px 6px rgba(0,0,0,0.6)",
+          cursor: "pointer",
+        }}
+      >
+        {muted ? "🔇 Muted" : "🔊 Sound"}
+      </button>
       <ScreenTransition screen={state.screen} skipFirst>
         {screen}
       </ScreenTransition>

@@ -12,6 +12,7 @@ type Props = {
   canClear: boolean;
   locked?: boolean;
   balanceDisplayDelta?: number;
+  onReloadBalance?: () => void;
   primaryAction?: {
     label: string;
     onClick: () => void;
@@ -30,6 +31,7 @@ export default function BetDock({
   canClear,
   locked = false,
   balanceDisplayDelta = 0,
+  onReloadBalance,
   primaryAction,
   rebet,
   rebet2x,
@@ -41,9 +43,34 @@ export default function BetDock({
     <div className="bet-dock" aria-label="Player dock">
       <div className="dock-readout">
         <span className="dr-label">Balance</span>
-        <span className={`dr-value${counting ? " dr-counting" : ""}`}>
-          ${displayedBalance.toLocaleString("en-US")}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 64 }}>
+          <span className={`dr-value${counting ? " dr-counting" : ""}`}>
+            ${displayedBalance.toLocaleString("en-US")}
+          </span>
+          {onReloadBalance && balance < 100 && !canClear && (
+            <button
+              type="button"
+              onClick={onReloadBalance}
+              style={{
+                background: "var(--magenta)",
+                color: "var(--cream)",
+                border: "1px solid var(--cream)",
+                padding: "6px 14px",
+                borderRadius: 999,
+                fontFamily: "var(--font-montserrat), sans-serif",
+                fontWeight: 800,
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                cursor: "pointer",
+                boxShadow: "0 0 16px rgba(251,0,159,0.45)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Reload
+            </button>
+          )}
+        </div>
       </div>
       <div className="dock-center">
         <ChipRack
