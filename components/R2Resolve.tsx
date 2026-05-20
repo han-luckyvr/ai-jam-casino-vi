@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
 import { useSfx } from "@/lib/audio";
@@ -11,7 +11,7 @@ import type {
   SwingOption,
 } from "@/lib/gameState";
 import OutcomeStamp from "./OutcomeStamp";
-import Confetti from "./Confetti";
+import ChipExplosion from "./ChipExplosion";
 import BetDock from "./BetDock";
 
 type Props = {
@@ -29,7 +29,7 @@ const HEADLINE_COLOR: Record<R2OutcomeKind, string> = {
   out: "var(--magenta)",
 };
 
-const FIRE_CONFETTI: ReadonlyArray<R2OutcomeKind> = [
+const FIRE_CHIPS: ReadonlyArray<R2OutcomeKind> = [
   "single",
   "double",
   "triple",
@@ -64,11 +64,26 @@ export default function R2Resolve({ state, dispatch }: Props) {
     return options[Math.floor(Math.random() * options.length)];
   }, [isWin, swingChoice]);
 
+  const [balanceDelta, setBalanceDelta] = useState<number>(
+    isWin ? -r2Winnings : 0,
+  );
+  useEffect(() => {
+    if (balanceDelta >= 0) return;
+    const remaining = Math.abs(balanceDelta);
+    // Adaptive cadence: total ~1.5s, floor 4ms per tick. Strict $1 per tick.
+    const tickMs = Math.max(4, Math.min(20, 1500 / remaining));
+    const t = window.setTimeout(
+      () => setBalanceDelta((d) => Math.min(0, d + 1)),
+      tickMs,
+    );
+    return () => window.clearTimeout(t);
+  }, [balanceDelta]);
+
   if (outcome === null) {
     return null;
   }
 
-  const showConfetti = FIRE_CONFETTI.includes(outcome.kind);
+  const showChips = FIRE_CHIPS.includes(outcome.kind);
 
   return (
     <main
@@ -167,13 +182,18 @@ export default function R2Resolve({ state, dispatch }: Props) {
         onClear={() => {}}
         canClear={false}
         locked
+        balanceDisplayDelta={balanceDelta}
         primaryAction={{
           label: "Play Again ▸",
           onClick: () => dispatch({ type: "PLAY_AGAIN" }),
         }}
       />
 
-      {showConfetti && <Confetti kind={outcome.kind} />}
+      {showChips && (
+        <ChipExplosion
+          kind={outcome.kind as Exclude<R2OutcomeKind, "out">}
+        />
+      )}
     </main>
   );
 }

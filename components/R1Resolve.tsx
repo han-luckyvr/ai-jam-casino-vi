@@ -19,10 +19,12 @@ export default function R1Resolve({ state, dispatch }: Props) {
   const winnings = state.r1Winnings;
   const contact = winnings > 0;
   const playContact = useSfx("contact");
+  const playOut = useSfx("out");
 
   useEffect(() => {
     if (contact) playContact();
-  }, [contact, playContact]);
+    else playOut();
+  }, [contact, playContact, playOut]);
 
   const onContinue = () => dispatch({ type: "PLAY_AGAIN" });
 

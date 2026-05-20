@@ -682,3 +682,74 @@ a {
     font-size: 16px;
   }
 }
+
+/* ===== Chip explosion (R2 win celebration) ===== */
+
+.chip-explosion-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.chip-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  margin-top: -14px;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+  animation-name: chip-burst-fly;
+  animation-timing-function: cubic-bezier(0.33, 0.06, 0.27, 1);
+  animation-fill-mode: forwards;
+  /* animation-duration and animation-delay set inline per chip */
+}
+
+@keyframes chip-burst-fly {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(var(--rotate-start, 0deg)) scale(0.4);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translate3d(
+        calc(var(--burst-dx) * 0.35),
+        calc(var(--burst-dy) * 0.35),
+        0
+      )
+      rotate(calc(var(--rotate-start, 0deg) + 60deg)) scale(1);
+  }
+  22% {
+    opacity: 1;
+    transform: translate3d(var(--burst-dx), var(--burst-dy), 0)
+      rotate(calc(var(--rotate-start, 0deg) + 120deg)) scale(1);
+  }
+  100% {
+    transform: translate3d(var(--target-dx), var(--target-dy), 0)
+      rotate(var(--rotate-end)) scale(0.55);
+    opacity: 0;
+  }
+}
+
+.dr-value.dr-counting {
+  color: var(--yellow);
+  text-shadow:
+    0 0 14px rgba(255, 224, 84, 0.85),
+    0 0 4px rgba(42, 234, 255, 0.6);
+  transition: color 0.18s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip-particle {
+    animation: none;
+    display: none;
+  }
+  .dr-value.dr-counting {
+    color: var(--cream);
+    text-shadow: 0 0 12px rgba(255, 244, 219, 0.4);
+  }
+}

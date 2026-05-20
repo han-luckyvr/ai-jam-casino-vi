@@ -11,6 +11,7 @@ type Props = {
   onClear: () => void;
   canClear: boolean;
   locked?: boolean;
+  balanceDisplayDelta?: number;
   primaryAction: {
     label: string;
     onClick: () => void;
@@ -26,15 +27,20 @@ export default function BetDock({
   onClear,
   canClear,
   locked = false,
+  balanceDisplayDelta = 0,
   primaryAction,
 }: Props) {
   const actionDisabled = primaryAction.disabled ?? false;
+  const displayedBalance = balance + balanceDisplayDelta;
+  const counting = balanceDisplayDelta < 0;
 
   return (
     <div className="bet-dock" aria-label="Player dock">
       <div className="dock-readout">
         <span className="dr-label">Balance</span>
-        <span className="dr-value">${balance.toLocaleString("en-US")}</span>
+        <span className={`dr-value${counting ? " dr-counting" : ""}`}>
+          ${displayedBalance.toLocaleString("en-US")}
+        </span>
       </div>
       <div className="dock-center">
         <ChipRack
