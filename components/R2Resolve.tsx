@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
+import { useSfx } from "@/lib/audio";
 import type {
   GameAction,
   GameState,
@@ -48,6 +49,13 @@ export default function R2Resolve({ state, dispatch }: Props) {
   const stake = sumStaked(state.bets);
 
   const isWin = outcome !== null && outcome.kind !== "out";
+  const playOut = useSfx("out");
+  const playWin = useSfx("r2Win");
+  useEffect(() => {
+    if (outcome === null) return;
+    if (outcome.kind === "out") playOut();
+    else playWin();
+  }, [outcome, playOut, playWin]);
   const swingChoice = state.swingChoice;
   const outText = useMemo(() => {
     if (isWin) return null;

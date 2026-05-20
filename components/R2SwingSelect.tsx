@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { rollSwing } from "@/lib/probabilities";
 import { sumStaked } from "@/lib/bets";
 import { useBalance, useJackpot } from "@/lib/persistence";
+import { useSfx } from "@/lib/audio";
 import type {
   GameAction,
   GameState,
@@ -88,6 +89,14 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
   const r2Stake = sumStaked(state.bets);
 
   const selected = state.swingChoice;
+
+  const playHype = useSfx("r2Hype");
+  const hypeFired = useRef(false);
+  useEffect(() => {
+    if (hypeFired.current) return;
+    hypeFired.current = true;
+    playHype();
+  }, [playHype]);
 
   useEffect(() => {
     onJackpotPulse(selected === 3);
