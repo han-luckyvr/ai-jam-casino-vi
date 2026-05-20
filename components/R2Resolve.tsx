@@ -10,7 +10,7 @@ import type {
   SwingOption,
 } from "@/lib/gameState";
 import OutcomeStamp from "./OutcomeStamp";
-import ChipExplosion from "./ChipExplosion";
+import ChipExplosion, { WIN_FLIGHT_MS } from "./ChipExplosion";
 import BetDock from "./BetDock";
 
 type Props = {
@@ -67,16 +67,17 @@ export default function R2Resolve({ state, dispatch }: Props) {
     isWin ? -r2Winnings : 0,
   );
   useEffect(() => {
-    if (balanceDelta >= 0) return;
-    const remaining = Math.abs(balanceDelta);
-    // Adaptive cadence: total ~1.5s, floor 4ms per tick. Strict $1 per tick.
-    const tickMs = Math.max(4, Math.min(20, 1500 / remaining));
-    const t = window.setTimeout(
-      () => setBalanceDelta((d) => Math.min(0, d + 1)),
-      tickMs,
-    );
-    return () => window.clearTimeout(t);
-  }, [balanceDelta]);
+    if (!isWin || r2Winnings <= 0) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / WIN_FLIGHT_MS);
+      setBalanceDelta(Math.round(-r2Winnings * (1 - t)));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isWin, r2Winnings]);
 
   if (outcome === null) {
     return null;

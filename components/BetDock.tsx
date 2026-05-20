@@ -12,7 +12,7 @@ type Props = {
   canClear: boolean;
   locked?: boolean;
   balanceDisplayDelta?: number;
-  primaryAction: {
+  primaryAction?: {
     label: string;
     onClick: () => void;
     disabled?: boolean;
@@ -34,7 +34,6 @@ export default function BetDock({
   rebet,
   rebet2x,
 }: Props) {
-  const actionDisabled = primaryAction.disabled ?? false;
   const displayedBalance = balance + balanceDisplayDelta;
   const counting = balanceDisplayDelta < 0;
 
@@ -56,31 +55,36 @@ export default function BetDock({
           rebet={rebet}
           rebet2x={rebet2x}
         />
-        <button
-          type="button"
-          onClick={primaryAction.onClick}
-          disabled={actionDisabled}
-          style={{
-            background: !actionDisabled ? "var(--magenta)" : "rgba(251,0,159,0.35)",
-            color: "var(--cream)",
-            border: "1px solid var(--cream)",
-            padding: "14px 30px",
-            borderRadius: 999,
-            fontFamily: "var(--font-montserrat), sans-serif",
-            fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            cursor: !actionDisabled ? "pointer" : "not-allowed",
-            opacity: !actionDisabled ? 1 : 0.55,
-            boxShadow: !actionDisabled ? "0 0 24px rgba(251,0,159,0.45)" : "none",
-            transition: "opacity 0.15s ease, box-shadow 0.15s ease",
-            fontVariantNumeric: "tabular-nums",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {primaryAction.label}
-        </button>
+        {primaryAction && (() => {
+          const actionDisabled = primaryAction.disabled ?? false;
+          return (
+            <button
+              type="button"
+              onClick={primaryAction.onClick}
+              disabled={actionDisabled}
+              style={{
+                background: !actionDisabled ? "var(--magenta)" : "rgba(251,0,159,0.35)",
+                color: "var(--cream)",
+                border: "1px solid var(--cream)",
+                padding: "14px 30px",
+                borderRadius: 999,
+                fontFamily: "var(--font-montserrat), sans-serif",
+                fontWeight: 800,
+                fontSize: 12,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                cursor: !actionDisabled ? "pointer" : "not-allowed",
+                opacity: !actionDisabled ? 1 : 0.55,
+                boxShadow: !actionDisabled ? "0 0 24px rgba(251,0,159,0.45)" : "none",
+                transition: "opacity 0.15s ease, box-shadow 0.15s ease",
+                fontVariantNumeric: "tabular-nums",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {primaryAction.label}
+            </button>
+          );
+        })()}
       </div>
       <div className="dock-readout right">
         <span className="dr-label">Staked</span>

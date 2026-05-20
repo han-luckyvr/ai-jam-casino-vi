@@ -59,9 +59,9 @@ function aggregate(bets: ReadonlyArray<Bet>) {
 }
 
 function chipColor(total: number): string {
-  if (total >= 25) return "var(--orange)";
-  if (total >= 10) return "var(--blue)";
-  if (total >= 5) return "var(--red)";
+  if (total >= 100) return "var(--orange)";
+  if (total >= 50) return "var(--blue)";
+  if (total >= 25) return "var(--red)";
   return "var(--cream)";
 }
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { rollSwing } from "@/lib/probabilities";
 import { useBalance, useJackpot } from "@/lib/persistence";
 import type {
@@ -86,18 +85,8 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
   const [jackpot, setJackpot] = useJackpot();
   const r2Stake = state.r1Winnings;
 
-  const selected = state.swingChoice;
-
-  useEffect(() => {
-    onJackpotPulse(selected === 3);
-  }, [selected, onJackpotPulse]);
-
-  const choose = (option: SwingOption) =>
-    dispatch({ type: "CHOOSE_SWING", option });
-
-  const onSwing = () => {
-    if (selected === null) return;
-    const r2Outcome: R2Outcome = rollSwing(selected);
+  const onSwing = (option: SwingOption) => {
+    const r2Outcome: R2Outcome = rollSwing(option);
     let winnings = 0;
     if (r2Outcome.kind === "hr") {
       winnings = jackpot;
@@ -208,8 +197,8 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
               spec={card}
               stake={r2Stake}
               jackpot={jackpot}
-              selected={selected === card.option}
-              onSelect={() => choose(card.option)}
+              selected={false}
+              onSelect={() => onSwing(card.option)}
             />
           ))}
         </div>
@@ -224,11 +213,6 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
         onClear={() => {}}
         canClear={false}
         locked
-        primaryAction={{
-          label: "▸ Swing",
-          onClick: onSwing,
-          disabled: selected === null,
-        }}
       />
     </main>
   );

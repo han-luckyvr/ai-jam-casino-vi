@@ -3,10 +3,10 @@
 import type { ChipValue } from "@/lib/gameState";
 
 const CHIPS: ReadonlyArray<{ value: ChipValue; bg: string; fg: string }> = [
-  { value: 1, bg: "var(--cream)", fg: "var(--bg)" },
-  { value: 5, bg: "var(--red)", fg: "var(--cream)" },
-  { value: 10, bg: "var(--blue)", fg: "var(--cream)" },
-  { value: 25, bg: "var(--orange)", fg: "var(--cream)" },
+  { value: 5, bg: "var(--cream)", fg: "var(--bg)" },
+  { value: 25, bg: "var(--red)", fg: "var(--cream)" },
+  { value: 50, bg: "var(--blue)", fg: "var(--cream)" },
+  { value: 100, bg: "var(--orange)", fg: "var(--cream)" },
 ];
 
 export type ActionPill = { label: string; onClick: () => void; disabled: boolean };

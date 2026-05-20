@@ -8,6 +8,8 @@ type Props = {
   kind: ChipKind;
 };
 
+export const WIN_FLIGHT_MS = 1800;
+
 const CHIP_COUNT: Record<ChipKind, number> = {
   single: 50,
   double: 75,
@@ -52,7 +54,9 @@ export default function ChipExplosion({ kind }: Props) {
       ".bet-dock .dock-readout:not(.right) .dr-value",
     );
     if (!el) return;
-    const rect = el.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const rect = range.getBoundingClientRect();
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
     setTarget({
@@ -68,6 +72,7 @@ export default function ChipExplosion({ kind }: Props) {
     for (let i = 0; i < n; i++) {
       const angle = (Math.PI * 2 * i) / n + (Math.random() - 0.5) * 0.45;
       const burstDist = (180 + Math.random() * 140) * scale;
+      const burstDelay = Math.random() * 100;
       out.push({
         id: i,
         color: CHIP_PALETTE[i % CHIP_PALETTE.length],
@@ -77,8 +82,8 @@ export default function ChipExplosion({ kind }: Props) {
         jitterY: (Math.random() - 0.5) * 36,
         rotateStart: Math.random() * 360,
         rotateEnd: 720 + Math.random() * 720,
-        burstDelay: Math.random() * 120,
-        duration: 1600 + Math.random() * 600,
+        burstDelay,
+        duration: WIN_FLIGHT_MS - burstDelay - Math.random() * 120,
       });
     }
     return out;
