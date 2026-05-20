@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { sumStaked } from "@/lib/bets";
 import { useBalance } from "@/lib/persistence";
 import { useSfx } from "@/lib/audio";
 import type {
@@ -46,7 +45,7 @@ export default function R2Resolve({ state, dispatch }: Props) {
   const [balance] = useBalance();
   const outcome = state.r2Outcome;
   const r2Winnings = state.lastHandWinnings;
-  const stake = sumStaked(state.bets);
+  const stake = state.r1Winnings;
 
   const isWin = outcome !== null && outcome.kind !== "out";
   const playOut = useSfx("out");

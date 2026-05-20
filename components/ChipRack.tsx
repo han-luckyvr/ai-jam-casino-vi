@@ -9,15 +9,19 @@ const CHIPS: ReadonlyArray<{ value: ChipValue; bg: string; fg: string }> = [
   { value: 25, bg: "var(--orange)", fg: "var(--cream)" },
 ];
 
+export type ActionPill = { label: string; onClick: () => void; disabled: boolean };
+
 type Props = {
   activeChip: ChipValue;
   onSelectChip: (chip: ChipValue) => void;
   onClear: () => void;
   canClear: boolean;
   locked?: boolean;
+  rebet?: ActionPill;
+  rebet2x?: ActionPill;
 };
 
-export default function ChipRack({ activeChip, onSelectChip, onClear, canClear, locked = false }: Props) {
+export default function ChipRack({ activeChip, onSelectChip, onClear, canClear, locked = false, rebet, rebet2x }: Props) {
   return (
     <div
       style={{
@@ -74,26 +78,58 @@ export default function ChipRack({ activeChip, onSelectChip, onClear, canClear, 
           onClear();
         }}
         disabled={locked || !canClear}
-        style={{
-          background: "transparent",
-          color: !locked && canClear ? "var(--cyan)" : "var(--muted)",
-          border: "1px solid var(--rule-strong)",
-          padding: "10px 22px",
-          borderRadius: 999,
-          fontFamily: "var(--font-montserrat), sans-serif",
-          fontWeight: 700,
-          fontSize: 11,
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-          cursor: !locked && canClear ? "pointer" : "not-allowed",
-          opacity: !locked && canClear ? 1 : 0.45,
-          transition: "opacity 0.15s ease",
-        }}
+        style={pillStyle(!locked && canClear)}
       >
         Clear
       </button>
+      {rebet && (
+        <button
+          type="button"
+          onClick={() => {
+            if (locked || rebet.disabled) return;
+            rebet.onClick();
+          }}
+          disabled={locked || rebet.disabled}
+          style={pillStyle(!locked && !rebet.disabled)}
+        >
+          {rebet.label}
+        </button>
+      )}
+      {rebet2x && (
+        <button
+          type="button"
+          onClick={() => {
+            if (locked || rebet2x.disabled) return;
+            rebet2x.onClick();
+          }}
+          disabled={locked || rebet2x.disabled}
+          style={pillStyle(!locked && !rebet2x.disabled)}
+        >
+          {rebet2x.label}
+        </button>
+      )}
     </div>
   );
+}
+
+function pillStyle(enabled: boolean): React.CSSProperties {
+  return {
+    background: "transparent",
+    color: enabled ? "var(--cyan)" : "var(--muted)",
+    border: "1px solid var(--rule-strong)",
+    padding: "10px 22px",
+    borderRadius: 999,
+    fontFamily: "var(--font-montserrat), sans-serif",
+    fontWeight: 700,
+    fontSize: 11,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    cursor: enabled ? "pointer" : "not-allowed",
+    opacity: enabled ? 1 : 0.45,
+    transition: "opacity 0.15s ease",
+    whiteSpace: "nowrap",
+    fontVariantNumeric: "tabular-nums",
+  };
 }
 
 function ChipFace({ value, bg, fg }: { value: ChipValue; bg: string; fg: string }) {

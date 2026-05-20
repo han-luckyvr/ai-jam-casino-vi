@@ -1016,7 +1016,7 @@ This single frame is re-used for W4 R1 resolve (contact variant) AND W6 R2 outco
   <!-- ============================================================ -->
   <h2 id="assets-vid">09 · Assets — Videos</h2>
   <!-- ============================================================ -->
-  <p class="muted"><strong>MVP scope:</strong> three videos. <code>VID-01</code> (R1 pitch cinematic) is the hero "full count" shot; <code>VID-02</code> (hit celebration) is shared across SINGLE / DOUBLE / TRIPLE outcomes — the specific outcome is conveyed by the §08 outcome stamp + §10 audio sting + confetti, not by a pose change, the same convention IMG-05 uses for its static fallback; <code>VID-03</code> (home-run / jackpot) is the triumphant Opt-3 HR celebration. All other dynamic moments — splash background, swing select — remain static pose images (see §08) + audio stings (see §10) + on-screen typography. Clip spec: 16:9, 1920×1080, MP4/H.264, no audio (audio is added separately from §10). Generated with <strong>ByteDance Seedance 2.0</strong> (<code>bytedance/seedance-2.0/reference-to-video</code>) via fal.ai. Reference images are passed alongside the prompt and addressed inline by token (<code>@Image1</code>, <code>@Image2</code>, …) for character likeness and scene-composition lock — same convention as the <code>from IMG-XX</code> cues in §08. <strong>Duration workflow:</strong> Seedance 2.0's minimum generation length is 4 seconds, so each clip is generated raw at its minimum length and ffmpeg-trimmed to its final deliverable (VID-01: raw <code>5s</code> → <code>2.5s</code> · VID-02: raw <code>4s</code> → <code>3s</code> · VID-03: raw <code>5s</code> → <code>4s</code>).</p>
+  <p class="muted"><strong>MVP scope:</strong> two videos. <code>VID-01</code> (R1 pitch cinematic) is the hero "full count" shot. <code>VID-02</code> (W2 R1 Bet-placement idle background loop) is the ambient looping plate behind the strike-zone grid — see <a href="PLAN.md">PLAN.md</a> M7 §7.8 for wiring. Hit and home-run celebrations are conveyed by the §08 outcome stamp + §10 audio sting + confetti rather than dedicated celebration clips; the same convention IMG-05 uses for its static fallback. All other dynamic moments — splash background, swing select — remain static pose images (see §08) + audio stings (see §10) + on-screen typography. Clip spec: MP4/H.264, no audio (audio is added separately from §10). Generated with <strong>ByteDance Seedance 2.0</strong> via fal.ai: VID-01 uses <code>bytedance/seedance-2.0/reference-to-video</code> with reference images addressed inline by token (<code>@Image1</code>, <code>@Image2</code>, …) — same convention as the <code>from IMG-XX</code> cues in §08; VID-02 uses <code>bytedance/seedance-2.0/image-to-video</code> with IMG-03 as the single source frame (and the same image piped to <code>end_image_url</code> for a tight loop). <strong>Duration workflow:</strong> Seedance 2.0's minimum generation length is 4 seconds. VID-01 is generated raw at <code>5s</code> and ffmpeg-trimmed to <code>2.5s</code>. VID-02 is generated raw at <code>5s</code> and used as-is (the loop attribute on the <code>&lt;video&gt;</code> element handles repetition).</p>
 
   <table class="asset-table">
     <thead><tr><th>ID</th><th>Use</th><th>Duration · Format</th><th>Gen</th><th>Prompt</th></tr></thead>
@@ -1041,6 +1041,24 @@ Beat 5 (4.5–5s): Frame freezes for one beat just before impact — the ball fi
 Background: stylised dark backdrop, deep purple-to-black gradient. Two soft floodlight glows at the upper corners. Faint horizontal cyan and magenta neon light-streaks behind him suggesting a stadium without resolving any architecture. No crowd, no mound dirt readable.
 
 Cinematic, neon, slight motion blur, no on-screen text. 16:9, 1080p, 5 seconds (raw generation length; trimmed to 2.5s in post).</pre>
+        </td>
+      </tr>
+
+      <tr>
+        <td>VID-02</td>
+        <td>W2 R1 Bet-placement idle background loop (behind strike-zone grid)</td>
+        <td>5s · MP4 · seamless loop · 720p · 16:9</td>
+        <td>Seedance 2.0 (I2V)</td>
+        <td>
+<pre class="prompt prompt-veo">Source frame: IMG-03 (passed as both image_url AND end_image_url for first+last-frame loop).
+
+Fixed camera, locked-off tripod, no pan, no zoom. Seamless loop-ready motion: ending state matches the beginning.
+
+Duck batter stands at rest, bat held still on shoulder, only the faintest shoulder rise-and-fall from breathing. Robot pitcher stands at rest on the mound, glove at side, head perfectly still. Neon signage glows with a slow low-frequency flicker on pink and cyan tubes. Stadium crowd is a still field of tiny twinkling lights. Stars twinkle faintly in the night sky. Slow, gentle, micro-movement only. 3D animated cinematic style.
+
+avoid jitter, avoid bent limbs, avoid identity drift, avoid added characters, avoid text overlays, avoid logo additions.
+
+Settings: duration 5, resolution 720p, aspect_ratio auto, generate_audio false. Pin seed once a take works. Note: fal.ai I2V endpoint has no separate negative_prompt field and no numeric motion-strength slider — intensity is controlled by vocabulary ("faintest", "still", "slow", "micro-movement only"); negatives are inline as the trailing "avoid …" clause. If output is over-animated, drop end_image_url (accept a slightly looser loop seam) or freeze one character ("Robot pitcher is completely motionless"). Wired by M7 §7.8 of PLAN.md.</pre>
         </td>
       </tr>
 
@@ -1136,7 +1154,7 @@ Cinematic, neon, slight motion blur, no on-screen text. 16:9, 1080p, 5 seconds (
     <li>✅ Original game — no existing casino floor analog.</li>
     <li>✅ VI branded — palette, type, mascot all sourced from VI Brand Bible 2025.</li>
     <li>✅ Web-based, deployed on Vercel.</li>
-    <li>✅ Trailer-ready — the R1 pitch cinematic (VID-01) doubles as the trailer hero shot. Additional swing/celebration videos are post-MVP polish, not blockers.</li>
+    <li>✅ Trailer-ready — the R1 pitch cinematic (VID-01) doubles as the trailer hero shot; the W2 idle loop (VID-02) gives the bet screen ambient life. Hit/HR celebrations rely on stamp + audio + confetti rather than dedicated video, keeping the asset payload tight.</li>
   </ul>
 
   <hr class="sep">

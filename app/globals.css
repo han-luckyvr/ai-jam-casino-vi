@@ -64,6 +64,22 @@ a {
   }
 }
 
+.r1-bet-idle-video {
+  display: block;
+}
+.r1-bet-idle-poster {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r1-bet-idle-video {
+    display: none;
+  }
+  .r1-bet-idle-poster {
+    display: block;
+  }
+}
+
 .scanline {
   background-image: repeating-linear-gradient(
     0deg,

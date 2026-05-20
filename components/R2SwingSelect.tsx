@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { rollSwing } from "@/lib/probabilities";
-import { sumStaked } from "@/lib/bets";
 import { useBalance, useJackpot } from "@/lib/persistence";
 import type {
   GameAction,
@@ -85,7 +84,7 @@ const CARDS: ReadonlyArray<CardSpec> = [
 export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props) {
   const [balance, setBalance] = useBalance();
   const [jackpot, setJackpot] = useJackpot();
-  const r2Stake = sumStaked(state.bets);
+  const r2Stake = state.r1Winnings;
 
   const selected = state.swingChoice;
 

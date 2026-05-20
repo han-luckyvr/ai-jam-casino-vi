@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChipValue } from "@/lib/gameState";
-import ChipRack from "./ChipRack";
+import ChipRack, { type ActionPill } from "./ChipRack";
 
 type Props = {
   balance: number;
@@ -17,6 +17,8 @@ type Props = {
     onClick: () => void;
     disabled?: boolean;
   };
+  rebet?: ActionPill;
+  rebet2x?: ActionPill;
 };
 
 export default function BetDock({
@@ -29,6 +31,8 @@ export default function BetDock({
   locked = false,
   balanceDisplayDelta = 0,
   primaryAction,
+  rebet,
+  rebet2x,
 }: Props) {
   const actionDisabled = primaryAction.disabled ?? false;
   const displayedBalance = balance + balanceDisplayDelta;
@@ -49,6 +53,8 @@ export default function BetDock({
           onClear={onClear}
           canClear={canClear}
           locked={locked}
+          rebet={rebet}
+          rebet2x={rebet2x}
         />
         <button
           type="button"

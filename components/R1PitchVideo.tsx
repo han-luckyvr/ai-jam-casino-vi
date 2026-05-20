@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { resolveR1Payout } from "@/lib/bets";
-import { useBalance } from "@/lib/persistence";
 import { useSfx } from "@/lib/audio";
 import type { GameAction, GameState } from "@/lib/gameState";
 
@@ -15,7 +14,6 @@ const FALLBACK_MS = 5000;
 const WHOOSH_DELAY_MS = 1000;
 
 export default function R1PitchVideo({ state, dispatch }: Props) {
-  const [, setBalance] = useBalance();
   const resolvedRef = useRef(false);
   const playWhoosh = useSfx("whoosh");
   const whooshTimerRef = useRef<number | null>(null);
@@ -27,9 +25,8 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
       state.pitchOutcome?.inZone === true
         ? resolveR1Payout(state.bets, state.pitchOutcome.cell)
         : 0;
-    if (winnings > 0) setBalance((b) => b + winnings);
     dispatch({ type: "RESOLVE_PITCH", r1Winnings: winnings });
-  }, [state.bets, state.pitchOutcome, dispatch, setBalance]);
+  }, [state.bets, state.pitchOutcome, dispatch]);
 
   useEffect(() => {
     const id = window.setTimeout(resolve, FALLBACK_MS);

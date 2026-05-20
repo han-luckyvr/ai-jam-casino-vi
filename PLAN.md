@@ -47,7 +47,7 @@ All RNG goes through one seeded helper (`rollWeighted`) in `lib/probabilities.ts
 - `components/JackpotTicker.tsx` (IMG-10): rendered as a sticky top bar visible on every screen except the splash backdrop (per all six wireframes).
 
 ### M4 · Round 1 bet placement (W2)
-- `components/R1BetPlacement.tsx` with IMG-03 as the `<img>` backdrop (object-fit: cover; centre kept clear).
+- `components/R1BetPlacement.tsx` with IMG-03 as the `<img>` backdrop (object-fit: cover; centre kept clear). Animated to a looping idle video in M7 §7.8.
 - `components/StrikeZoneGrid.tsx` (IMG-07): CSS Grid 3×3, neon cyan tubular borders, inset box‑shadow glow, scanline `repeating-linear-gradient` at 3%, SVG corner endpoint marker. Cells track hover + placed states; selected = 8% magenta fill.
 - 8 line markers as small dots positioned outside the grid edge (3 left/right for rows, 3 top/bottom for cols, 2 corners for diagonals).
 - `components/ChipRack.tsx` (IMG-08): four SVG chips ($1 cream, $5 cyan, $25 magenta, $100 yellow), active state = cyan ring + `transform: scale(1.08)`.
@@ -165,6 +165,14 @@ Today the repo is mid‑M6 with several M7 targets already partially done — Ou
 **7.7 Final asset audit**
 - Side‑by‑side comparison in the dev server: ChipRack ↔ [IMG-08.jpg](IMG-08.jpg), OutcomeStamp variants ↔ [IMG-09.jpg](IMG-09.jpg), JackpotTicker ↔ [IMG-10.jpg](IMG-10.jpg). Iterate tokens (opacity, glow radius, border-radius) to close visible gaps. Commit each polish pass as a discrete commit so regressions are bisectable.
 
+**7.8 W2 idle background loop** ([components/R1BetPlacement.tsx](components/R1BetPlacement.tsx), [app/globals.css](app/globals.css), `public/assets/VID-02.mp4`)
+- Existing: W2 renders a flat `<img>` of [IMG-03.jpg](IMG-03.jpg); scene reads as a still photograph.
+1. Generate `VID-02.mp4` via Seedance 2.0 image-to-video (fal.ai endpoint). Prompt (Seedance 2.0 I2V convention: describe motion + camera + mood only; do NOT re-describe the source; state desired state positively rather than negating verbs the model knows): *"Fixed camera, locked-off tripod, no pan, no zoom. Seamless loop-ready motion: ending state matches the beginning. Duck batter stands at rest, bat held still on shoulder, only the faintest shoulder rise-and-fall from breathing. Robot pitcher stands at rest on the mound, glove at side, head perfectly still. Neon signage glows with a slow low-frequency flicker on pink and cyan tubes. Stadium crowd is a still field of tiny twinkling lights. Stars twinkle faintly in the night sky. Slow, gentle, micro-movement only. 3D animated cinematic style. avoid jitter, avoid bent limbs, avoid identity drift, avoid added characters, avoid text overlays, avoid logo additions."*
+2. Settings: `duration: 5`, `resolution: 720p`, `aspect_ratio: auto`, `generate_audio: false`. For a tight loop, set both `image_url` and `end_image_url` to IMG-03.jpg (first+last-frame mode — Seedance 2.0 has no separate negative-prompt field on the I2V endpoint, and no numeric motion-strength slider; control intensity via vocabulary). Pin `seed` once a take works. Target ≤ ~2 MB MP4, 1088×608-ish. Drop into `public/assets/`.
+3. In [R1BetPlacement.tsx](components/R1BetPlacement.tsx), replace the `<img src="/assets/IMG-03.jpg">` block with a `<video src="/assets/VID-02.mp4" poster="/assets/IMG-03.jpg" autoPlay loop muted playsInline aria-hidden className="r1-bet-idle-video">` carrying the same absolute positioning + `objectPosition: "center 60%"`. Render a sibling `<img className="r1-bet-idle-poster" src="/assets/IMG-03.jpg" ...>` for the reduced-motion fallback.
+4. In [app/globals.css](app/globals.css), default `.r1-bet-idle-video { display: block; }` / `.r1-bet-idle-poster { display: none; }`, then flip them inside `@media (prefers-reduced-motion: reduce)` — matches the project's existing CSS-only reduced-motion pattern.
+5. Verify: dev-server, splash → R1_BET; background loops smoothly under the strike-zone grid; reduced-motion shows static JPG; mobile autoplay (Safari iOS) works because `muted playsInline` are set.
+
 ### M8 · Audio (FINAL)
 - Generate AUD-02…07 per the §10 prompts via fal.ai. Tools: `fal-ai/stable-audio` for AUD-05 (jackpot stinger), AUD-06 (strikeout sting); `fal-ai/elevenlabs/sound-effects` for AUD-02 (whoosh), AUD-03 (3 bat cracks), AUD-04 (chip click), AUD-07 (3 crowd reactions).
 - Drop files into `public/assets/audio/`.
@@ -268,6 +276,7 @@ Smoke‑test: create a throwaway branch, push a trivial change, confirm a previe
 | `lib/__dev__/rtpHarness.ts` | Relocated RTP simulator (optional M7, NEW) |
 | `public/assets/IMG-0[1-6].{jpg,png}` | Copied from repo root (M1) |
 | `public/assets/VID-01.mp4` | Copied from repo root (M1) |
+| `public/assets/VID-02.mp4` | W2 idle background loop (M7 §7.8) |
 | `lib/audio.ts`, `public/assets/audio/AUD-0[2-7].*` | Audio layer (M8) |
 
 ## Verification
@@ -279,7 +288,7 @@ Smoke‑test: create a throwaway branch, push a trivial change, confirm a previe
 - M4: place zone + line bets at multiple chips; switch chip up and down; verify reprice; verify CTA disabled states.
 - M5: throw pitches in a loop and confirm both outcomes fire; verify R1 payout math for zone, line, and zone+line on the winning cell.
 - M6: walk all three swing options through all outcomes; verify Option 3 HR credits + resets the pool; verify R2 stake = sum of R1 stakes.
-- M7: visual diff each polish target against reference imagery (ChipRack vs [IMG-08.jpg](IMG-08.jpg), OutcomeStamp vs [IMG-09.jpg](IMG-09.jpg), JackpotTicker vs [IMG-10.jpg](IMG-10.jpg)); enable `prefers-reduced-motion: reduce` and verify ticker glow + neon wipe pause; capture screenshots at 375×667, 390×844, 768×1024, 1440×900 plus 667×375 and 1024×768 landscape; verify each wireframe (W1–W6) is recognisable and tap targets ≥44px; dev RNG button gone from UI; no stray `console.log` from M3–M6 paths; `npm run build` succeeds clean.
+- M7: visual diff each polish target against reference imagery (ChipRack vs [IMG-08.jpg](IMG-08.jpg), OutcomeStamp vs [IMG-09.jpg](IMG-09.jpg), JackpotTicker vs [IMG-10.jpg](IMG-10.jpg)); enable `prefers-reduced-motion: reduce` and verify ticker glow + neon wipe pause; capture screenshots at 375×667, 390×844, 768×1024, 1440×900 plus 667×375 and 1024×768 landscape; verify each wireframe (W1–W6) is recognisable and tap targets ≥44px; dev RNG button gone from UI; no stray `console.log` from M3–M6 paths; `npm run build` succeeds clean; W2 R1Bet idle video autoplays + loops in Chrome/Safari/Firefox and falls back to IMG-03.jpg under `prefers-reduced-motion: reduce`.
 - M8: every audio trigger fires once and only once per event; mute toggle persists.
 - M9: preview URL on a throwaway branch renders splash → full game loop → jackpot persists across reload; production URL on `main` does the same; Mobile Safari video autoplay works with `muted playsInline`; Lighthouse mobile Performance ≥80 / Accessibility ≥90; rollback path tested once (promote a prior deployment from the Vercel dashboard, confirm production URL serves it, promote latest back).
 

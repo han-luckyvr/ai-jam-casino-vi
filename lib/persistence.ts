@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Bet } from "./gameState";
 
 // Cross-component sync: every useLocalStorageState hook for a given key
 // subscribes to a module-level pub/sub. Any setter call fans the new value
@@ -81,3 +82,4 @@ export function useLocalStorageState<T>(
 export const useBalance = () => useLocalStorageState<number>("sz.balance", 1000);
 export const useJackpot = () => useLocalStorageState<number>("sz.jackpot", 1000);
 export const useMuted = () => useLocalStorageState<boolean>("sz.muted", false);
+export const useLastBets = () => useLocalStorageState<Bet[]>("sz.lastBets", []);

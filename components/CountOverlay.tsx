@@ -5,7 +5,7 @@ export default function CountOverlay() {
     <div
       className="count-bug"
       role="status"
-      aria-label="Top of 7th, 3 balls, 2 strikes, 2 outs"
+      aria-label="Top of 9th, 3 balls, 2 strikes, 2 outs"
     >
       <div className="count-header">
         <div className="count-mark">
@@ -14,7 +14,7 @@ export default function CountOverlay() {
         </div>
         <div className="count-inning">
           <span className="count-arrow top" aria-hidden="true" />
-          <span>7TH</span>
+          <span>9TH</span>
         </div>
       </div>
       <div className="count-body">

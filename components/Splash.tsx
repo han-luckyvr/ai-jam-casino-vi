@@ -81,7 +81,8 @@ export default function Splash({ onTap }: Props) {
             flexDirection: "column",
             alignItems: "center",
             gap: "14px",
-            whiteSpace: "nowrap",
+            textAlign: "center",
+            maxWidth: "min(560px, 86vw)",
           }}
         >
           <p
@@ -96,6 +97,34 @@ export default function Splash({ onTap }: Props) {
             }}
           >
             A Vegas Infinite Original
+          </p>
+          <p
+            style={{
+              margin: 0,
+              color: "var(--cyan)",
+              fontFamily: "var(--font-montserrat), sans-serif",
+              fontWeight: 800,
+              fontSize: "12px",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              textShadow: "0 0 10px rgba(42, 234, 255, 0.35)",
+            }}
+          >
+            9th Inning · Bases Loaded · Two Outs · Full Count
+          </p>
+          <p
+            style={{
+              margin: 0,
+              color: "var(--cream)",
+              fontFamily: "var(--font-montserrat), sans-serif",
+              fontWeight: 600,
+              fontSize: "15px",
+              lineHeight: 1.45,
+              letterSpacing: "0.02em",
+              textShadow: "0 2px 8px rgba(0, 0, 0, 0.65)",
+            }}
+          >
+            You&rsquo;re the team&rsquo;s last hitter. Can you save the game and bring home the win?
           </p>
           <p
             className="splash-blink"
