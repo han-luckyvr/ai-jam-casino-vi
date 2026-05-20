@@ -33,52 +33,89 @@ export default function Confetti({ kind }: Props) {
     switch (kind) {
       case "single":
         fire({
-          particleCount: 60,
-          spread: 60,
-          startVelocity: 35,
-          origin: { x: 0.5, y: 0.8 },
+          particleCount: 70,
+          spread: 70,
+          startVelocity: 38,
+          origin: { x: 0.5, y: 0.78 },
         });
         break;
       case "double":
         fire({
-          particleCount: 60,
-          spread: 55,
-          startVelocity: 38,
-          angle: 60,
-          origin: { x: 0.2, y: 0.85 },
-        });
-        fire({
-          particleCount: 60,
-          spread: 55,
-          startVelocity: 38,
-          angle: 120,
-          origin: { x: 0.8, y: 0.85 },
-        });
-        break;
-      case "triple":
-        fire({
-          particleCount: 70,
-          spread: 65,
-          startVelocity: 40,
-          origin: { x: 0.5, y: 0.8 },
+          particleCount: 80,
+          spread: 75,
+          startVelocity: 42,
+          origin: { x: 0.5, y: 0.78 },
         });
         fire(
           {
-            particleCount: 65,
+            particleCount: 50,
             spread: 60,
-            startVelocity: 42,
+            startVelocity: 40,
             angle: 60,
             origin: { x: 0.2, y: 0.85 },
           },
-          250,
+          150,
         );
         fire(
           {
-            particleCount: 65,
+            particleCount: 50,
             spread: 60,
-            startVelocity: 42,
+            startVelocity: 40,
             angle: 120,
             origin: { x: 0.8, y: 0.85 },
+          },
+          150,
+        );
+        break;
+      case "triple":
+        fire({
+          particleCount: 110,
+          spread: 90,
+          startVelocity: 48,
+          scalar: 1.1,
+          origin: { x: 0.5, y: 0.75 },
+        });
+        fire(
+          {
+            particleCount: 60,
+            spread: 65,
+            startVelocity: 45,
+            scalar: 1.1,
+            angle: 65,
+            origin: { x: 0.18, y: 0.85 },
+          },
+          200,
+        );
+        fire(
+          {
+            particleCount: 60,
+            spread: 65,
+            startVelocity: 45,
+            scalar: 1.1,
+            angle: 115,
+            origin: { x: 0.82, y: 0.85 },
+          },
+          200,
+        );
+        fire(
+          {
+            particleCount: 55,
+            spread: 70,
+            startVelocity: 50,
+            scalar: 1.1,
+            angle: 70,
+            origin: { x: 0.12, y: 0.78 },
+          },
+          500,
+        );
+        fire(
+          {
+            particleCount: 55,
+            spread: 70,
+            startVelocity: 50,
+            scalar: 1.1,
+            angle: 110,
+            origin: { x: 0.88, y: 0.78 },
           },
           500,
         );

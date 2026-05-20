@@ -20,9 +20,10 @@ export default function OutcomeStamp({ kind }: Props) {
   }
 
   const palette = STAMP_STYLES[kind];
+  const tierClass = STAMP_TIER_CLASS[kind];
 
   return (
-    <div className="outcome-stamp">
+    <div className={tierClass ? `outcome-stamp ${tierClass}` : "outcome-stamp"}>
       <div
         role="status"
         aria-live="polite"
@@ -78,6 +79,13 @@ export default function OutcomeStamp({ kind }: Props) {
     </div>
   );
 }
+
+const STAMP_TIER_CLASS: Record<Exclude<R2OutcomeKind, "hr">, string> = {
+  single: "",
+  double: "outcome-stamp--double",
+  triple: "outcome-stamp--triple",
+  out: "",
+};
 
 const STAMP_STYLES: Record<
   Exclude<R2OutcomeKind, "hr">,
