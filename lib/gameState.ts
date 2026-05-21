@@ -16,9 +16,7 @@ export type Bet =
   | { kind: "zone"; cell: number; amount: number }
   | { kind: "line"; line: number; amount: number };
 
-export type PitchOutcome =
-  | { inZone: true; cell: number }
-  | { inZone: false; xPct: number; yPct: number };
+export type PitchOutcome = { cell: number };
 
 export type SwingOption = 1 | 2 | 3;
 

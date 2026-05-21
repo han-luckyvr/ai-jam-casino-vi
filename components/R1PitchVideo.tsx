@@ -21,10 +21,9 @@ export default function R1PitchVideo({ state, dispatch }: Props) {
   const resolve = useCallback(() => {
     if (resolvedRef.current) return;
     resolvedRef.current = true;
-    const winnings =
-      state.pitchOutcome?.inZone === true
-        ? resolveR1Payout(state.bets, state.pitchOutcome.cell)
-        : 0;
+    const winnings = state.pitchOutcome
+      ? resolveR1Payout(state.bets, state.pitchOutcome.cell)
+      : 0;
     dispatch({ type: "RESOLVE_PITCH", r1Winnings: winnings });
   }, [state.bets, state.pitchOutcome, dispatch]);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { rollSwing } from "@/lib/probabilities";
+import { computeR2Option3Probs, rollSwing } from "@/lib/probabilities";
 import { useBalance, useJackpot } from "@/lib/persistence";
 import type {
   GameAction,
@@ -36,7 +36,14 @@ const fmt = (n: number) => `$${n.toLocaleString("en-US")}`;
 const payoutFor = (mult: number) => (stake: number) =>
   fmt(Math.floor(stake * mult));
 
-const CARDS: ReadonlyArray<CardSpec> = [
+const formatProb = (p: number): string => {
+  const pct = p * 100;
+  if (pct < 1) return `${pct.toFixed(2)}%`;
+  if (pct < 10) return `${pct.toFixed(1)}%`;
+  return `${Math.round(pct)}%`;
+};
+
+const STATIC_CARDS: ReadonlyArray<CardSpec> = [
   {
     option: 1,
     title: "Contact",
@@ -55,12 +62,16 @@ const CARDS: ReadonlyArray<CardSpec> = [
     color: "var(--magenta)",
     glow: "rgba(251, 0, 159, 0.55)",
     rows: [
-      { label: "Double", probPct: "40%", payout: payoutFor(2),  emphasis: "primary"   },
-      { label: "Single", probPct: "15%", payout: payoutFor(1),  emphasis: "secondary" },
-      { label: "Out",    probPct: "45%", payout: () => "—",     emphasis: "muted"     },
+      { label: "Double", probPct: "28%", payout: payoutFor(2),  emphasis: "primary"   },
+      { label: "Single", probPct: "39%", payout: payoutFor(1),  emphasis: "secondary" },
+      { label: "Out",    probPct: "33%", payout: () => "—",     emphasis: "muted"     },
     ],
   },
-  {
+];
+
+function buildOption3Card(stake: number, jackpot: number): CardSpec {
+  const p = computeR2Option3Probs(stake, jackpot);
+  return {
     option: 3,
     title: "Grand Slam",
     risk: "High risk · jackpot bonus",
@@ -69,29 +80,35 @@ const CARDS: ReadonlyArray<CardSpec> = [
     rows: [
       {
         label: "Home Run",
-        probPct: "0.1%",
-        payout: (_stake, jackpot) => fmt(jackpot),
+        probPct: formatProb(p.hr),
+        payout: (_stake, jp) => fmt(jp),
         emphasis: "primary",
       },
-      { label: "Triple", probPct: "12%",   payout: payoutFor(3), emphasis: "primary"   },
-      { label: "Double", probPct: "10%",   payout: payoutFor(2), emphasis: "secondary" },
-      { label: "Out",    probPct: "77.9%", payout: () => "—",    emphasis: "muted"     },
+      { label: "Triple", probPct: formatProb(p.triple), payout: payoutFor(3), emphasis: "primary"   },
+      { label: "Double", probPct: formatProb(p.double), payout: payoutFor(2), emphasis: "secondary" },
+      { label: "Single", probPct: formatProb(p.single), payout: payoutFor(1), emphasis: "secondary" },
+      { label: "Out",    probPct: formatProb(p.out),    payout: () => "—",    emphasis: "muted"     },
     ],
-  },
-];
+  };
+}
 
 export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props) {
   const [balance, setBalance] = useBalance();
   const [jackpot, setJackpot] = useJackpot();
   const r2Stake = state.r1Winnings;
 
+  const cards: ReadonlyArray<CardSpec> = [
+    ...STATIC_CARDS,
+    buildOption3Card(r2Stake, jackpot),
+  ];
+
   const onSwing = (option: SwingOption) => {
-    const r2Outcome: R2Outcome = rollSwing(option);
+    const r2Outcome: R2Outcome = rollSwing(option, { stake: r2Stake, jackpot });
     let winnings = 0;
     if (r2Outcome.kind === "hr") {
       winnings = jackpot;
       setBalance((b) => b + winnings);
-      setJackpot(() => 1000);
+      setJackpot(() => 2000);
     } else if (r2Outcome.multiplier > 0) {
       winnings = Math.floor(r2Stake * r2Outcome.multiplier);
       setBalance((b) => b + winnings);
@@ -191,7 +208,7 @@ export default function R2SwingSelect({ state, dispatch, onJackpotPulse }: Props
             maxWidth: 980,
           }}
         >
-          {CARDS.map((card) => (
+          {cards.map((card) => (
             <SwingCard
               key={card.option}
               spec={card}

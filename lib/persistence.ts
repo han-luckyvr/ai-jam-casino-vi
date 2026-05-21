@@ -80,6 +80,6 @@ export function useLocalStorageState<T>(
 }
 
 export const useBalance = () => useLocalStorageState<number>("sz.balance", 1000);
-export const useJackpot = () => useLocalStorageState<number>("sz.jackpot", 1000);
+export const useJackpot = () => useLocalStorageState<number>("sz.jackpot", 2000);
 export const useMuted = () => useLocalStorageState<boolean>("sz.muted", false);
 export const useLastBets = () => useLocalStorageState<Bet[]>("sz.lastBets", []);

@@ -143,11 +143,7 @@ function ResolveGrid({
   outcome: GameState["pitchOutcome"];
   contact: boolean;
 }) {
-  const cell =
-    outcome && outcome.inZone ? outcome.cell : null;
-  // Ball position outside-grid (0..100 == grid extent; negative / >100 == off-grid)
-  const offGridX = outcome && !outcome.inZone ? outcome.xPct : null;
-  const offGridY = outcome && !outcome.inZone ? outcome.yPct : null;
+  const cell = outcome ? outcome.cell : null;
 
   return (
     <div
@@ -215,20 +211,6 @@ function ResolveGrid({
         />
       ))}
 
-      {offGridX !== null && offGridY !== null && (
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            left: `${offGridX}%`,
-            top: `${offGridY}%`,
-            transform: "translate(-50%, -50%)",
-            zIndex: 4,
-          }}
-        >
-          <Ball />
-        </span>
-      )}
     </div>
   );
 }
